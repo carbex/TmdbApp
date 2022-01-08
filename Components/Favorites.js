@@ -2,11 +2,15 @@ import React from "react";
 import { View, StyleSheet, SafeAreaView } from "react-native";
 import { connect } from "react-redux";
 import FilmList from "./FilmList";
+import Avatar from './Avatar'
 
 const Favorites = ({ navigation, favoritesFilm }) => {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View style={styles.mainContainer}>
+      <View style={styles.avatarContainer}>
+        <Avatar/>
+      </View>
         <FilmList
           films={favoritesFilm}
           navigation={navigation}
@@ -22,11 +26,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
+  avatarContainer: {
+    alignItems: 'center'
+  }
 });
 
 const mapStateToProps = (state) => {
   return {
-    favoritesFilm: state.favoritesFilm,
+    favoritesFilm: state.toggleFavorite.favoritesFilm,
   };
 };
 

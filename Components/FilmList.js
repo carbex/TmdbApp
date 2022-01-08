@@ -41,7 +41,7 @@ const FilmList = ({ navigation, films = [], page, totalPages, loadFilms, favorit
 
 const mapStateToProps = state => {
     return {
-        favoritesFilm: state.favoritesFilm
+        favoritesFilm: state.toggleFavorite.favoritesFilm
     }
 }
 export default connect(mapStateToProps, null)(FilmList);

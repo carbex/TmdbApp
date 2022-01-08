@@ -1,4 +1,4 @@
-import API_TOKEN from "@env"
+import { API_TOKEN } from "@env"
 
 export function getFilms (text, page) {
     const url = 'https://api.themoviedb.org/3/search/movie?api_key=' + API_TOKEN + '&language=fr&query=' + text + '&page=' + page
