@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 import { getImage } from "../API/TMDBApi";
 import FadIn from "../Animations/FadIn";
 import { Ionicons } from "@expo/vector-icons";
+import moment from "moment";
 
 const FilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
+
   
-  console.log('Render de film item!')
 
   const _displayFavoriteImage = () => {
     if (isFilmFavorite) {
@@ -21,7 +22,10 @@ const FilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
     }
   };
 
-  return (
+  
+
+  return useMemo(() => {
+    return (
     <FadIn>
       <TouchableOpacity
         style={styles.mainContainer}
@@ -46,12 +50,14 @@ const FilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
             </Text>
           </View>
           <View style={styles.dateContainer}>
-            <Text style={styles.date}>Sorti le {film.release_date}</Text>
+            <Text style={styles.date}>Date de sortie: {moment(new Date(film.release_date)).format("YYYY")}</Text>
           </View>
         </View>
       </TouchableOpacity>
     </FadIn>
   );
+  }, [film])
+  
 }
 
 const styles = StyleSheet.create({
@@ -113,4 +119,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FilmItem;
+export default React.memo(FilmItem);

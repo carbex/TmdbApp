@@ -139,7 +139,7 @@ const FilmDetailScreen = ({ navigation, route, dispatch, favoritesFilm }) => {
           </TouchableOpacity>
           <Text style={styles.description_text}>{film.overview}</Text>
           <Text style={styles.default_text}>
-            Sorti le {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
+            Sorti le  : {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
           </Text>
           <Text style={styles.default_text}>
             Note : {film.vote_average} / 10

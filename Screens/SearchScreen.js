@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   TextInput,
@@ -19,13 +19,6 @@ const SearchScreen = ({ navigation }) => {
   const [films, setFilms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => { 
-    console.log("I'm mounting!") 
-    return () => console.log("I'm unmounting!") 
-  }, [])
-
-  console.log("I'm updating!")
-
   const _loadFilms = async () => {
     if (searchedText.length > 0) {
       setIsLoading(true);
@@ -38,6 +31,12 @@ const SearchScreen = ({ navigation }) => {
       }
     }
   }
+
+  useEffect(() => {
+    if (films.length === 0) {
+      _loadFilms();
+    }
+  }, [films]);
 
   const _displayLoading = () => {
     if (isLoading) {
@@ -58,12 +57,6 @@ const SearchScreen = ({ navigation }) => {
     setTotalPages(0);
     setFilms([]);
   };
-
-  useEffect(() => {
-    if (films.length === 0) {
-      _loadFilms();
-    }
-  }, [films]);
 
   return (
     <SafeAreaView style={styles.mainContainer}>
@@ -100,7 +93,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "white",
-    paddingTop: 3
+    paddingTop: 3,
   },
   textInput: {
     marginLeft: 5,
@@ -127,6 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: "orange",
   },
   listContainer: {
+    flex: 1,
     marginLeft: 5,
     marginRight: 5,
     marginBottom: 5,

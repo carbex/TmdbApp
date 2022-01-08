@@ -8,10 +8,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import SearchScreen from "../Screens/SearchScreen";
 import FilmDetailScreen from "../Screens/FilmDetailScreen";
 import Favorites from "../Components/Favorites";
+import News from "../Components/News";
+import Modal from "../Components/Modal";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../Constants/Colors";
 import { Text, Pressable, useColorScheme } from "react-native";
-import Modal from "../Components/Modal";
 
 export default function Navigation({ colorScheme }) {
   return (
@@ -102,6 +103,15 @@ const MovieTabNavigator = () => {
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="bookmark" color={color} />
           ),
+        }}
+      />
+      <Tab.Screen
+        name="News"
+        component={News}
+        options={{
+          headerShown: true,
+          title: "Les mieux notés",
+          tabBarIcon: ({ color }) => <TabBarIcon name="film" color={color} />,
         }}
       />
     </Tab.Navigator>
