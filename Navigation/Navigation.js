@@ -29,21 +29,26 @@ const Stack = createStackNavigator();
 const SearchStackNavigator = () => {
   const colorScheme = useColorScheme();
   return (
-    <Stack.Navigator screenOptions={{ headerMode: "screen" }}>
-      <Stack.Group
-        screenOptions={{ headerStyle: { backgroundColor: "white" }, headerTitleStyle: {fontWeight: 'bold'} }}
-      >
+    <Stack.Navigator
+      screenOptions={{
+        headerMode: "screen",
+        headerStyle: { backgroundColor: "white" },
+        headerTitleStyle: { fontWeight: "bold" },
+      }}
+    >
+      <Stack.Group>
         <Stack.Screen
           name="Search"
           component={SearchScreen}
           options={({ navigation }) => ({
-            title: "Rechercher un film",
             headerShown: true,
+            title: "Rechercher un film",
             headerRight: () => (
               <Pressable
                 onPress={() => navigation.navigate("Modal")}
                 style={({ pressed }) => ({
                   opacity: pressed ? 0.5 : 1,
+                  marginRight: 15,
                 })}
               >
                 <Text>Modal</Text>
@@ -99,7 +104,7 @@ const MovieTabNavigator = () => {
         component={Favorites}
         options={{
           headerShown: true,
-          title: "Favoris",
+          title: "Mes favoris",
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="bookmark" color={color} />
           ),

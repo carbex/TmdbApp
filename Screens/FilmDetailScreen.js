@@ -186,6 +186,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "white",
+    paddingHorizontal: 3
   },
   loadingContainer: {
     position: "absolute",

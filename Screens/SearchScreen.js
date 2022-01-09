@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "white",
-    paddingTop: 3,
+    paddingHorizontal: 3
   },
   textInput: {
     marginLeft: 5,
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     borderColor: "#000000",
     borderWidth: 1,
     paddingLeft: 5,
-    borderRadius: 4,
+    borderRadius: 10,
     marginBottom: 5,
   },
   buttonContainer: {
@@ -115,14 +115,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 4,
-    elevation: 3,
+    borderRadius: 10,
+    elevation: 2,
     backgroundColor: "orange",
   },
   listContainer: {
     flex: 1,
-    marginLeft: 5,
-    marginRight: 5,
     marginBottom: 5,
   },
   loadingContainer: {

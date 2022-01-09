@@ -45,7 +45,7 @@ const FilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
             <Text style={styles.vote}>{film.vote_average}</Text>
           </View>
           <View style={styles.descriptionContainer}>
-            <Text style={styles.description} numberOfLines={6}>
+            <Text style={styles.description} numberOfLines={5}>
               {film.overview}
             </Text>
           </View>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     color: "#666666",
   },
   descriptionContainer: {
-    flex: 7,
+    flex: 6,
   },
   description: {
     fontStyle: "italic",

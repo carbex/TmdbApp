@@ -9,7 +9,7 @@ const Favorites = ({ navigation, favoritesFilm }) => {
     <SafeAreaView style={styles.mainContainer}>
       <View style={styles.mainContainer}>
       <View style={styles.avatarContainer}>
-        <Avatar/>
+        <Avatar navigation={navigation}/>
       </View>
         <FilmList
           films={favoritesFilm}
@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "white",
+    paddingHorizontal: 3
   },
   avatarContainer: {
     alignItems: 'center'
