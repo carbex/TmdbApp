@@ -1,8 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useLayoutEffect,
-} from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -23,11 +19,17 @@ import { Ionicons } from "@expo/vector-icons";
 // import EnlargeShrink from "../Animations/EnlargeShrink";
 import Bounce from "../Animations/Bounce";
 
-const FilmDetailScreen = ({ navigation, route, dispatch, favoritesFilm }) => {
+const FilmDetail = ({
+  navigation,
+  route,
+  dispatch,
+  favoritesFilm,
+  seenFilms,
+}) => {
   const { idFilm } = route.params;
   const [film, setFilm] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
-  const [isTouched, setIsTouched] = useState(false)
+  const [isTouched, setIsTouched] = useState(false);
 
   const _shareFilm = async () => {
     setIsLoading(true);
@@ -45,7 +47,7 @@ const FilmDetailScreen = ({ navigation, route, dispatch, favoritesFilm }) => {
               style={styles.headerRightButton}
               onPress={() => _shareFilm()}
             >
-              <Ionicons size={30} name="share"/>
+              <Ionicons size={30} name="share" />
             </TouchableOpacity>
           );
         }
@@ -97,21 +99,26 @@ const FilmDetailScreen = ({ navigation, route, dispatch, favoritesFilm }) => {
     // Les composants abonnés reçoivent la liste des nouveaux films favoris, la mappe à leurs props et re-rend
   };
 
+  const _toggleSeen = () => {
+    const action = { type: "TOGGLE_SEEN", value: film };
+    dispatch(action);
+  };
+
   const _displayFavoriteImage = () => {
     // let sourceImage = require("../Images/favorite_border.png");
-    let iconName = "heart-outline"
-    let color = "grey"
+    let iconName = "heart-outline";
+    let color = "grey";
     // let shouldEnlarge = false
     if (favoritesFilm.findIndex((item) => item.id === film.id) !== -1) {
       // sourceImage = require("../Images/favorite.png");
-      iconName = "heart"
-      color = "orange"
+      iconName = "heart";
+      color = "orange";
       // shouldEnlarge = true
     }
     return (
       // <EnlargeShrink shouldEnlarge={shouldEnlarge}>
       <Bounce isTouched={isTouched}>
-        <Ionicons size={40} name={iconName} color={color}/>
+        <Ionicons size={40} name={iconName} color={color} />
         {/* <Image style={styles.favoriteImage} source={sourceImage} /> */}
       </Bounce>
       // </EnlargeShrink>
@@ -121,6 +128,7 @@ const FilmDetailScreen = ({ navigation, route, dispatch, favoritesFilm }) => {
   const _displayFilm = () => {
     if (film !== undefined) {
       return (
+        <>
         <ScrollView style={styles.scrollViewContainer}>
           <Image
             style={styles.image}
@@ -139,7 +147,8 @@ const FilmDetailScreen = ({ navigation, route, dispatch, favoritesFilm }) => {
           </TouchableOpacity>
           <Text style={styles.description_text}>{film.overview}</Text>
           <Text style={styles.default_text}>
-            Sorti le  : {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
+            Sorti le :{" "}
+            {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
           </Text>
           <Text style={styles.default_text}>
             Note : {film.vote_average} / 10
@@ -167,26 +176,45 @@ const FilmDetailScreen = ({ navigation, route, dispatch, favoritesFilm }) => {
               .join(" / ")}
           </Text>
         </ScrollView>
+          </>
+      );
+    }
+  };
+
+  const _displaySeenButton = () => {
+    if (film !== undefined) {
+      let buttonTitle = "Marquer comme vu";
+      if (seenFilms.findIndex((item) => item.id === film.id) !== -1) {
+        buttonTitle = "Marquer comme non vu";
+      }
+      return (
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.seenButton}
+            onPress={() => _toggleSeen()}
+          >
+            <Text>{buttonTitle}</Text>
+          </TouchableOpacity>
+        </View>
       );
     }
   };
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <View style={styles.mainContainer}>
-        {_displayFilm()}
-        {_displayLoading()}
-        {_displayFloatingButton()}
-      </View>
+      {_displayFilm()}
+      {_displaySeenButton()}
+      {_displayLoading()}
+      {_displayFloatingButton()}
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 3
+    paddingHorizontal: 3,
   },
   loadingContainer: {
     position: "absolute",
@@ -198,8 +226,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   scrollViewContainer: {
-    //   flex: 1,
-    // backgroundColor: "pink",
+    flex: 1,
+    marginBottom: 5,
   },
   image: {
     height: 200,
@@ -233,7 +261,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   favoriteImage: {
-    // flex: 1,
     width: 40,
     height: 40,
   },
@@ -242,7 +269,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     right: 20,
-    bottom: 20,
+    bottom: 120,
     borderRadius: 30,
     backgroundColor: "#e91e63",
     justifyContent: "center",
@@ -252,11 +279,26 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  buttonContainer: {
+    marginLeft: 5,
+    marginRight: 5,
+    marginBottom: 5,
+  },
+  seenButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 10,
+    elevation: 2,
+    backgroundColor: "orange",
+  },
 });
 
 const mapStateToProps = (state) => {
   return {
     favoritesFilm: state.toggleFavorite.favoritesFilm,
+    seenFilms: state.toggleSeen.seenFilms,
   };
 };
 
@@ -268,4 +310,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(FilmDetailScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(FilmDetail);

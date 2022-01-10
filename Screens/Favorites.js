@@ -1,22 +1,20 @@
 import React from "react";
 import { View, StyleSheet, SafeAreaView } from "react-native";
 import { connect } from "react-redux";
-import FilmList from "./FilmList";
-import Avatar from './Avatar'
+import FilmList from "../Components/FilmList";
+import Avatar from '../Components/Avatar'
 
 const Favorites = ({ navigation, favoritesFilm }) => {
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <View style={styles.mainContainer}>
       <View style={styles.avatarContainer}>
         <Avatar navigation={navigation}/>
       </View>
         <FilmList
           films={favoritesFilm}
           navigation={navigation}
-          favoritesList={true}
+          loadMoreOnScroll={false}
         />
-      </View>
     </SafeAreaView>
   );
 }

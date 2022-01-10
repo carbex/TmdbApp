@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
 
-export default function Modal() {
+export default function Modal({ children }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Modal</Text>
@@ -11,6 +11,7 @@ export default function Modal() {
 
       {/* Use a light status bar on iOS to account for the black space above the modal */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+      {children}
     </View>
   );
 }

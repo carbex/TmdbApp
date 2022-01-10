@@ -12,7 +12,7 @@ import { getFilms } from "../API/TMDBApi";
 import { connect } from "react-redux";
 import FilmList from "../Components/FilmList";
 
-const SearchScreen = ({ navigation }) => {
+const Search = ({ navigation }) => {
   const [searchedText, setSearchedText] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -60,7 +60,6 @@ const SearchScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <View style={styles.mainContainer}>
         <TextInput
           style={styles.textInput}
           placeholder="Titre du film"
@@ -80,11 +79,10 @@ const SearchScreen = ({ navigation }) => {
             loadFilms={_loadFilms}
             page={page}
             totalPages={totalPages}
-            favoriteList={false}
+            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
           />
         </View>
         {_displayLoading()}
-      </View>
     </SafeAreaView>
   );
 }
@@ -116,7 +114,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 10,
-    elevation: 2,
+    elevation: 8,
     backgroundColor: "orange",
   },
   listContainer: {
@@ -140,4 +138,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, null)(SearchScreen);
+export default connect(mapStateToProps, null)(Search);

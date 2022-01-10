@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Modal,
   View,
   Text,
@@ -11,9 +12,11 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
+import Layout from "../Constants/Layout";
 
 const Avatar = ({ navigation, dispatch, avatar }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const height = Layout.window.height;
 
   const _showImagePicker = async () => {
     const permissionResult =
@@ -24,7 +27,7 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
       return;
     }
 
-    setModalVisible(false);
+    _toggleModal();
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -47,7 +50,7 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
       return;
     }
 
-    setModalVisible(false);
+    _toggleModal();
 
     const result = await ImagePicker.launchCameraAsync();
 
@@ -57,7 +60,9 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
     }
   };
 
-  const _avatarClicked = () => {};
+  const _toggleModal = () => {
+    setModalVisible(!modalVisible);
+  };
 
   return (
     <>
@@ -65,48 +70,43 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
+        onRequestClose={_toggleModal}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View
-              style={{
-                position: "absolute",
-                top: -25,
-                marginLeft: "auto",
-                marginRight: "auto",
-                backgroundColor: 'white',
-                borderRadius: 25
-              }}
-            >
-              <TouchableOpacity
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setModalVisible(!modalVisible)}
+        <TouchableWithoutFeedback onPress={_toggleModal}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Pressable
+                style={{
+                  position: "absolute",
+                  top: -22,
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  backgroundColor: "white",
+                  borderRadius: 25,
+                  padding: 10,
+                }}
+                onPress={_toggleModal}
               >
                 <Ionicons size={25} name="close" />
-              </TouchableOpacity>
+              </Pressable>
+              <View style={{ flexDirection: "row" }}>
+                <TouchableOpacity style={[styles.button]} onPress={_openCamera}>
+                  <Ionicons size={30} name="camera" />
+                  <Text>Camera</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button]}
+                  onPress={_showImagePicker}
+                >
+                  <Ionicons size={30} name="folder" />
+                  <Text>Album</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-            <TouchableOpacity
-              style={[styles.button, styles.buttonOpen]}
-              onPress={_openCamera}
-            >
-              <Text>Utiliser la caméra</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.buttonOpen]}
-              onPress={_showImagePicker}
-            >
-              <Text>Accéder à la gallerie</Text>
-            </TouchableOpacity>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
-      <TouchableOpacity
-        style={styles.touchableOpacity}
-        onPress={() => setModalVisible(true)}
-      >
+      <TouchableOpacity style={styles.touchableOpacity} onPress={_toggleModal}>
         <Image style={styles.avatar} source={avatar} />
       </TouchableOpacity>
     </>
@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
     backgroundColor: "rgba(0, 0, 0, 0.3)",
   },
   modalView: {
@@ -153,6 +152,7 @@ const styles = StyleSheet.create({
   button: {
     padding: 10,
     margin: 5,
+    alignItems: "center",
   },
   buttonOpen: {
     elevation: 2,

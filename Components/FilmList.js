@@ -10,10 +10,11 @@ const FilmList = ({
   totalPages,
   loadFilms,
   favoritesFilm,
+  loadMoreOnScroll=false,
 }) => {
 
   const _displayFilmDetail = (idFilm) => {
-    navigation.navigate("FilmDetail", { idFilm: idFilm });
+    navigation.navigate("FilmDetail", { idFilm: idFilm })
   };
 
   const _renderItem = ({ item }) => {
@@ -27,10 +28,10 @@ const FilmList = ({
         }
         displayFilmDetail={_displayFilmDetail}
       />
-    );
+    );    
   };
 
-  return useMemo(() => {
+  // return useMemo(() => {
     return (
       <FlatList
         data={films}
@@ -39,13 +40,13 @@ const FilmList = ({
         renderItem={_renderItem}
         onEndReachedThreshold={0.5}
         onEndReached={() => {
-          if (page < totalPages) {
+          if (loadMoreOnScroll && page < totalPages) {
             loadFilms();
           }
         }}
       />
     );
-  }, [films]);
+  // }, [films]);
 };
 
 const mapStateToProps = (state) => {

@@ -5,8 +5,8 @@ import {
   ActivityIndicator,
   SafeAreaView,
 } from "react-native";
-import { getNewFilms, getImage } from "../API/TMDBApi";
-import FilmList from "./FilmList";
+import { getNewFilms } from "../API/TMDBApi";
+import FilmList from "../Components/FilmList";
 
 const News = ({ navigation }) => {
   const [page, setPage] = useState(0);
@@ -45,7 +45,6 @@ const News = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <View style={styles.mainContainer}>
         <View style={styles.listContainer}>
           <FilmList
             films={newFilms}
@@ -53,11 +52,10 @@ const News = ({ navigation }) => {
             loadFilms={_loadFilms}
             page={page}
             totalPages={totalPages}
-            favoriteList={false}
+            loadMoreOnScroll={true}
           />
         </View>
         {_displayLoading()}
-      </View>
     </SafeAreaView>
   );
 };

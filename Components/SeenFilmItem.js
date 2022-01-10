@@ -5,7 +5,8 @@ import FadIn from "../Animations/FadIn";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 
-const FilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
+const SeenFilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
+  const [toggleDisplay, setToggleDisplay] = useState(false);
 
   const _displayFavoriteImage = () => {
     if (isFilmFavorite) {
@@ -20,12 +21,24 @@ const FilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
     }
   };
 
-  return useMemo(() => {
-    return (
+  const _displayText = () => {
+    if (toggleDisplay) {
+      return (
+        <Text style={styles.text}>
+          Sorti le {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
+        </Text>
+      );
+    } else {
+      return <Text style={styles.text}>{film.title}</Text>;
+    }
+  };
+
+  return (
     <FadIn>
       <TouchableOpacity
         style={styles.mainContainer}
         onPress={() => displayFilmDetail(film.id)}
+        onLongPress={() => setToggleDisplay(!toggleDisplay)}
       >
         <View>
           <Image
@@ -35,42 +48,28 @@ const FilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
           {_displayFavoriteImage()}
         </View>
 
-        <View style={styles.contentContainer}>
-          <View style={styles.headerContainer}>
-            <Text style={styles.title} numberOfLines={2}>{film.title}</Text>
-            <Text style={styles.vote}>{film.vote_average}</Text>
-          </View>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.description} numberOfLines={5}>
-              {film.overview}
-            </Text>
-          </View>
-          <View style={styles.dateContainer}>
-            <Text style={styles.date}>Date de sortie: {moment(new Date(film.release_date)).format("YYYY")}</Text>
-          </View>
-        </View>
+        <View style={styles.contentContainer}>{_displayText()}</View>
       </TouchableOpacity>
     </FadIn>
   );
-  }, [film])
-  
-}
+};
 
 const styles = StyleSheet.create({
   mainContainer: {
-    height: 190,
     flexDirection: "row",
     marginBottom: 5,
   },
   image: {
-    height: 180,
-    width: 120,
-    margin: 5,
-    backgroundColor: "grey",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    borderColor: "#9B9B9B",
+    borderWidth: 2,
   },
   contentContainer: {
     flex: 1,
     margin: 5,
+    justifyContent: "center",
   },
   headerContainer: {
     flex: 3,
@@ -85,7 +84,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: "bold",
-    fontSize: 26,
+    fontSize: 22,
     color: "#666666",
   },
   vote: {
@@ -114,4 +113,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default (FilmItem);
+export default SeenFilmItem;
