@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 import { getImage } from "../API/TMDBApi";
-import FadIn from "../Animations/FadIn";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
+
+const IMAGE_SIZE = 70;
+const SPACING = 20;
 
 const SeenFilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
   const [toggleDisplay, setToggleDisplay] = useState(false);
@@ -24,7 +26,7 @@ const SeenFilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
   const _displayText = () => {
     if (toggleDisplay) {
       return (
-        <Text style={styles.text}>
+        <Text style={styles.date}>
           Sorti le {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
         </Text>
       );
@@ -34,82 +36,65 @@ const SeenFilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
   };
 
   return (
-    <FadIn>
-      <TouchableOpacity
-        style={styles.mainContainer}
-        onPress={() => displayFilmDetail(film.id)}
-        onLongPress={() => setToggleDisplay(!toggleDisplay)}
-      >
-        <View>
-          <Image
-            style={styles.image}
-            source={{ uri: getImage(film.poster_path) }}
-          />
-          {_displayFavoriteImage()}
-        </View>
-
-        <View style={styles.contentContainer}>{_displayText()}</View>
-      </TouchableOpacity>
-    </FadIn>
+    <TouchableOpacity
+      style={styles.mainContainer}
+      onPress={() => displayFilmDetail(film.id)}
+      onLongPress={() => setToggleDisplay(!toggleDisplay)}
+    >
+      <View style={styles.imageContainer}>
+        <Image
+          style={styles.image}
+          source={{ uri: getImage(film.poster_path) }}
+        />
+        {_displayFavoriteImage()}
+      </View>
+      <View style={styles.contentContainer}>{_displayText()}</View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   mainContainer: {
+    flex: 1,
     flexDirection: "row",
-    marginBottom: 5,
+    alignItems: "center",
+    padding: SPACING,
+    marginVertical: SPACING / 2,
+    borderRadius: SPACING,
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4.84,
+    elevation: 5,
+  },
+  imageContainer: {
+    marginRight: SPACING / 2,
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderColor: "#9B9B9B",
-    borderWidth: 2,
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
+    borderRadius: IMAGE_SIZE,
   },
   contentContainer: {
     flex: 1,
-    margin: 5,
-    justifyContent: "center",
-  },
-  headerContainer: {
-    flex: 3,
-    flexDirection: "row",
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 20,
-    flex: 1,
-    flexWrap: "wrap",
-    paddingRight: 5,
   },
   text: {
     fontWeight: "bold",
     fontSize: 22,
     color: "#666666",
   },
-  vote: {
-    fontWeight: "bold",
-    fontSize: 26,
-    color: "#666666",
-  },
-  descriptionContainer: {
-    flex: 6,
-  },
-  description: {
-    fontStyle: "italic",
-    color: "#666666",
-  },
-  dateContainer: {
-    flex: 1,
-  },
   date: {
-    textAlign: "right",
-    fontSize: 14,
+    fontSize: 18,
+    color: "#666666",
   },
   favoriteImage: {
     position: "absolute",
-    bottom: 12,
-    right: 12,
+    top: -2,
+    right: -2,
   },
 });
 

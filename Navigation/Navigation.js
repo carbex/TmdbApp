@@ -42,9 +42,9 @@ const SearchStackNavigator = () => {
           name="SearchScreen"
           component={Search}
           options={({ navigation }) => ({
-            headerShown: true,
-            title: "Rechercher un film",
-            headerTitleAlign: 'center',
+            headerShown: false,
+            title: "Rechercher",
+            headerTitleAlign: "center",
             headerRight: () => (
               <Pressable
                 onPress={() => navigation.navigate("Modal")}
@@ -54,12 +54,6 @@ const SearchStackNavigator = () => {
                 })}
               >
                 <Text>Modal</Text>
-                {/* <Ionicons
-                name="search"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              /> */}
               </Pressable>
             ),
           })}
@@ -67,7 +61,25 @@ const SearchStackNavigator = () => {
         <SearchStack.Screen
           name="FilmDetail"
           component={FilmDetail}
-          options={{ headerShown: true, title: "Rechercher un film" }}
+          options={() => ({
+            headerShown: true,
+            // headerTransparent: true,
+            title: "",
+            gestureEnabled: true,
+            headerBackImage: () => (
+              <Ionicons
+                name="arrow-back-outline"
+                size={30}
+                color={Colors[colorScheme].text}
+                style={{
+                  marginRight: 15,
+                  borderRadius: 20,
+                  backgroundColor: "white",
+                  padding: 5,
+                }}
+              />
+            ),
+          })}
         />
       </SearchStack.Group>
       <SearchStack.Group screenOptions={{ presentation: "modal" }}>
@@ -81,100 +93,180 @@ const SearchStackNavigator = () => {
   );
 };
 
-const FavoritesStack = createStackNavigator()
+const FavoritesStack = createStackNavigator();
 
 const FavoritesStackNavigator = () => {
+  const colorScheme = useColorScheme();
   return (
     <FavoritesStack.Navigator
       screenOptions={{
         headerMode: "screen",
         headerStyle: { backgroundColor: "white" },
         headerTitleStyle: { fontWeight: "bold" },
+        headerStyle: {
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 4.84,
+          elevation: 12,
+        },
       }}
     >
       <FavoritesStack.Group>
         <FavoritesStack.Screen
           name="FavoritesScreen"
           component={Favorites}
-          options={{ headerShown: true, title: "Mes favoris", headerTitleAlign: 'center' }}
+          options={{
+            headerShown: true,
+            title: "Favoris",
+            headerTitleAlign: "center",
+          }}
         />
         <FavoritesStack.Screen
           name="FilmDetail"
           component={FilmDetail}
-          options={{ headerShown: true, title: "Mes favoris" }}
+          options={() => ({
+            headerShown: true,
+            title: "",
+            gestureEnabled: true,
+            headerBackImage: () => (
+              <Ionicons
+                name="arrow-back-outline"
+                size={30}
+                color={Colors[colorScheme].text}
+                style={{ marginRight: 15 }}
+              />
+            ),
+          })}
         />
       </FavoritesStack.Group>
     </FavoritesStack.Navigator>
   );
-}
+};
 
-const NewsStack = createStackNavigator()
+const NewsStack = createStackNavigator();
 
 const NewsStackNavigator = () => {
+  const colorScheme = useColorScheme();
   return (
     <NewsStack.Navigator
       screenOptions={{
         headerMode: "screen",
         headerStyle: { backgroundColor: "white" },
         headerTitleStyle: { fontWeight: "bold" },
+        headerStyle: {
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 4.84,
+          elevation: 12,
+        },
       }}
     >
       <NewsStack.Group>
         <NewsStack.Screen
           name="NewsScreen"
           component={News}
-          options={{ headerShown: true, title: "Les dernier films", headerTitleAlign: 'center' }}
+          options={{
+            headerShown: true,
+            title: "Nouveautés",
+            headerTitleAlign: "center",
+          }}
         />
         <NewsStack.Screen
           name="FilmDetail"
           component={FilmDetail}
-          options={{ headerShown: true, title: "Les dernier films" }}
+          options={() => ({
+            headerShown: true,
+            title: "",
+            gestureEnabled: true,
+            headerBackImage: () => (
+              <Ionicons
+                name="arrow-back-outline"
+                size={30}
+                color={Colors[colorScheme].text}
+                style={{ marginRight: 15 }}
+              />
+            ),
+          })}
         />
       </NewsStack.Group>
     </NewsStack.Navigator>
   );
-}
+};
 
-const SeenStack = createStackNavigator()
+const SeenStack = createStackNavigator();
 
 const SeenStackNavigator = () => {
+  const colorScheme = useColorScheme();
   return (
     <SeenStack.Navigator
       screenOptions={{
         headerMode: "screen",
         headerStyle: { backgroundColor: "white" },
         headerTitleStyle: { fontWeight: "bold" },
+        headerStyle: {
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 4.84,
+          elevation: 12,
+        },
       }}
     >
       <SeenStack.Group>
         <SeenStack.Screen
           name="SeenScreen"
           component={Seen}
-          options={{ headerShown: true, title: "Mes films vu", headerTitleAlign: 'center' }}
+          options={{
+            headerShown: true,
+            title: "Déjà vu",
+            headerTitleAlign: "center",
+          }}
         />
         <SeenStack.Screen
           name="FilmDetail"
           component={FilmDetail}
-          options={{ headerShown: true, title: "Mes films vu" }}
+          options={() => ({
+            headerShown: true,
+            title: "",
+            gestureEnabled: true,
+            headerBackImage: () => (
+              <Ionicons
+                name="arrow-back-outline"
+                size={30}
+                color={Colors[colorScheme].text}
+                style={{ marginRight: 15 }}
+              />
+            ),
+          })}
         />
-        </SeenStack.Group>
+      </SeenStack.Group>
     </SeenStack.Navigator>
   );
-}
-  
+};
 
-const Tab = createBottomTabNavigator();
+const BottomTab = createBottomTabNavigator();
 
 const MovieTabNavigator = () => {
   const colorScheme = useColorScheme();
   return (
-    <Tab.Navigator
+    <BottomTab.Navigator
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
-        tabBarInactiveTintColor: "grey"
+        tabBarInactiveTintColor: "black",
       }}
     >
-      <Tab.Screen
+      <BottomTab.Screen
         name="SearchStack"
         component={SearchStackNavigator}
         options={{
@@ -183,36 +275,40 @@ const MovieTabNavigator = () => {
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
         }}
       />
-      <Tab.Screen
+      <BottomTab.Screen
         name="NewsStack"
         component={NewsStackNavigator}
         options={{
           headerShown: false,
           title: "Nouveautés",
-          tabBarIcon: ({ color }) => <TabBarIcon name="film" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="film-outline" color={color} />
+          ),
         }}
       />
-      <Tab.Screen
+      <BottomTab.Screen
         name="FavoritesStack"
         component={FavoritesStackNavigator}
         options={{
           headerShown: false,
           title: "Favoris",
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="bookmark" color={color} />
+            <TabBarIcon name="heart-outline" color={color} />
           ),
         }}
       />
-      <Tab.Screen
+      <BottomTab.Screen
         name="SeenStack"
         component={SeenStackNavigator}
         options={{
           headerShown: false,
           title: "Vu",
-          tabBarIcon: ({ color }) => <TabBarIcon name="checkmark-circle-outline" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="eye-outline" color={color} />
+          ),
         }}
       />
-    </Tab.Navigator>
+    </BottomTab.Navigator>
   );
 };
 

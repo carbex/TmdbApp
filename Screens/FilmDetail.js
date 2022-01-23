@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Share,
-  Platform,
+  StatusBar
 } from "react-native";
 import { getFilmDetail, getImage } from "../API/TMDBApi";
 import moment from "moment";
@@ -18,6 +18,7 @@ import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
 // import EnlargeShrink from "../Animations/EnlargeShrink";
 import Bounce from "../Animations/Bounce";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 const FilmDetail = ({
   navigation,
@@ -29,7 +30,8 @@ const FilmDetail = ({
   const { idFilm } = route.params;
   const [film, setFilm] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
-  const [isTouched, setIsTouched] = useState(false);
+  const [heartIsTouched, setHeartIsTouched] = useState(false);
+  const [eyeIsTouched, setEyeIsTouched] = useState(false);
 
   const _shareFilm = async () => {
     setIsLoading(true);
@@ -37,37 +39,48 @@ const FilmDetail = ({
     setIsLoading(false);
   };
 
-  // Share action button into the headerRight navigation on IOS
+  // Action buttons into the headerRight navigation
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => {
-        if (film != undefined && Platform.OS === "ios") {
+        if (film != undefined) {
           return (
-            <TouchableOpacity
-              style={styles.headerRightButton}
-              onPress={() => _shareFilm()}
-            >
-              <Ionicons size={30} name="share" />
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableWithoutFeedback
+                style={styles.headerRightButton}
+                onPress={() => _shareFilm()}
+              >
+                <Ionicons size={30} name="share-social" color="black" />
+              </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                style={styles.favoriteContainer}
+                onPress={() => _toggleFavorite()}
+                onPressIn={() => setHeartIsTouched(true)}
+                onPressOut={() => setHeartIsTouched(false)}
+              >
+                {_displayFavoriteImage()}
+              </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                style={styles.seenContainer}
+                onPress={() => _toggleSeen()}
+                onPressIn={() => setEyeIsTouched(true)}
+                onPressOut={() => setEyeIsTouched(false)}
+              >
+                {_displaySeenImage()}
+              </TouchableWithoutFeedback>
+            </View>
           );
         }
       },
     });
-  }, [navigation]);
-
-  // Share floating action button on Android
-  const _displayFloatingButton = () => {
-    if (film != undefined && Platform.OS === "android") {
-      return (
-        <TouchableOpacity
-          style={styles.floatingActionButton}
-          onPress={() => _shareFilm()}
-        >
-          <Ionicons size={30} name="share" color="white" />
-        </TouchableOpacity>
-      );
-    }
-  };
+  }, [
+    navigation,
+    favoritesFilm,
+    seenFilms,
+    heartIsTouched,
+    eyeIsTouched,
+    film,
+  ]);
 
   const _displayLoading = () => {
     if (isLoading) {
@@ -105,23 +118,30 @@ const FilmDetail = ({
   };
 
   const _displayFavoriteImage = () => {
-    // let sourceImage = require("../Images/favorite_border.png");
     let iconName = "heart-outline";
-    let color = "grey";
-    // let shouldEnlarge = false
+    let color = "black";
     if (favoritesFilm.findIndex((item) => item.id === film.id) !== -1) {
-      // sourceImage = require("../Images/favorite.png");
       iconName = "heart";
       color = "orange";
-      // shouldEnlarge = true
     }
     return (
-      // <EnlargeShrink shouldEnlarge={shouldEnlarge}>
-      <Bounce isTouched={isTouched}>
-        <Ionicons size={40} name={iconName} color={color} />
-        {/* <Image style={styles.favoriteImage} source={sourceImage} /> */}
+      <Bounce isTouched={heartIsTouched}>
+        <Ionicons size={30} name={iconName} color={color} />
       </Bounce>
-      // </EnlargeShrink>
+    );
+  };
+
+  const _displaySeenImage = () => {
+    let iconName = "eye-outline";
+    let color = "black";
+    if (seenFilms.findIndex((item) => item.id === film.id) !== -1) {
+      iconName = "eye";
+      color = "orange";
+    }
+    return (
+      <Bounce isTouched={eyeIsTouched}>
+        <Ionicons size={30} name={iconName} color={color} />
+      </Bounce>
     );
   };
 
@@ -129,83 +149,55 @@ const FilmDetail = ({
     if (film !== undefined) {
       return (
         <>
-        <ScrollView style={styles.scrollViewContainer}>
-          <Image
-            style={styles.image}
-            source={{ uri: getImage(film.backdrop_path) }}
-          />
-          <Text style={styles.title_text}>{film.title}</Text>
-          <TouchableOpacity
-            style={styles.favoriteContainer}
-            onPress={() => _toggleFavorite()}
-            onPressIn={() => setIsTouched(true)}
-            onPressOut={() => setIsTouched(false)}
-            // onPressIn={() => onPressIn()}
-            // onPressOut={() => onPressOut()}
-          >
-            {_displayFavoriteImage()}
-          </TouchableOpacity>
-          <Text style={styles.description_text}>{film.overview}</Text>
-          <Text style={styles.default_text}>
-            Sorti le :{" "}
-            {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
-          </Text>
-          <Text style={styles.default_text}>
-            Note : {film.vote_average} / 10
-          </Text>
-          <Text style={styles.default_text}>
-            Nombre de votes : {film.vote_count}
-          </Text>
-          <Text style={styles.default_text}>
-            Budget : {numeral(film.budget).format("0,0[.]00 $")}
-          </Text>
-          <Text style={styles.default_text}>
-            Genre(s) :{" "}
-            {film.genres
-              .map(function (genre) {
-                return genre.name;
-              })
-              .join(" / ")}
-          </Text>
-          <Text style={styles.default_text}>
-            Companie(s) :{" "}
-            {film.production_companies
-              .map(function (company) {
-                return company.name;
-              })
-              .join(" / ")}
-          </Text>
-        </ScrollView>
-          </>
-      );
-    }
-  };
-
-  const _displaySeenButton = () => {
-    if (film !== undefined) {
-      let buttonTitle = "Marquer comme vu";
-      if (seenFilms.findIndex((item) => item.id === film.id) !== -1) {
-        buttonTitle = "Marquer comme non vu";
-      }
-      return (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.seenButton}
-            onPress={() => _toggleSeen()}
-          >
-            <Text>{buttonTitle}</Text>
-          </TouchableOpacity>
-        </View>
+          <ScrollView style={styles.scrollViewContainer}>
+            <Image
+              style={styles.image}
+              source={{ uri: getImage(film.backdrop_path) }}
+            />
+            <View style={styles.bodyContainer}>
+              <Text style={styles.title_text}>{film.title}</Text>
+              <Text style={styles.description_text}>{film.overview}</Text>
+              <Text style={styles.default_text}>
+                Sorti le :{" "}
+                {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
+              </Text>
+              <Text style={styles.default_text}>
+                Note : {film.vote_average} / 10
+              </Text>
+              <Text style={styles.default_text}>
+                Nombre de votes : {film.vote_count}
+              </Text>
+              <Text style={styles.default_text}>
+                Budget : {numeral(film.budget).format("0,0[.]00 $")}
+              </Text>
+              <Text style={styles.default_text}>
+                Genre(s) :{" "}
+                {film.genres
+                  .map(function (genre) {
+                    return genre.name;
+                  })
+                  .join(" / ")}
+              </Text>
+              <Text style={styles.default_text}>
+                Companie(s) :{" "}
+                {film.production_companies
+                  .map(function (company) {
+                    return company.name;
+                  })
+                  .join(" / ")}
+              </Text>
+            </View>
+          </ScrollView>
+        </>
       );
     }
   };
 
   return (
     <SafeAreaView style={styles.mainContainer}>
+      {/* <StatusBar translucent backgroundColor="rgba(0,0,0,0.4)" barStyle="light-content"/> */}
       {_displayFilm()}
-      {_displaySeenButton()}
       {_displayLoading()}
-      {_displayFloatingButton()}
     </SafeAreaView>
   );
 };
@@ -214,7 +206,9 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "white",
-    paddingHorizontal: 3,
+  },
+  bodyContainer: {
+    marginHorizontal: 10,
   },
   loadingContainer: {
     position: "absolute",
@@ -227,11 +221,10 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     flex: 1,
-    marginBottom: 5,
+    // marginBottom: 5,
   },
   image: {
-    height: 200,
-    margin: 5,
+    height: 300,
     resizeMode: "cover",
   },
   title_text: {
@@ -258,40 +251,30 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   favoriteContainer: {
-    alignItems: "center",
-  },
-  favoriteImage: {
-    width: 40,
-    height: 40,
-  },
-  floatingActionButton: {
-    position: "absolute",
-    width: 60,
-    height: 60,
-    right: 20,
-    bottom: 120,
-    borderRadius: 30,
-    backgroundColor: "#e91e63",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  shareImage: {
-    width: 30,
-    height: 30,
-  },
-  buttonContainer: {
-    marginLeft: 5,
     marginRight: 5,
-    marginBottom: 5,
-  },
-  seenButton: {
-    alignItems: "center",
+    paddingTop: 6,
+    paddingBottom: 4,
+    paddingHorizontal: 5,
+    borderRadius: 30,
+    backgroundColor: "white",
     justifyContent: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 10,
-    elevation: 2,
-    backgroundColor: "orange",
+    alignItems: "center",
+  },
+  seenContainer: {
+    marginRight: 5,
+    padding: 5,
+    borderRadius: 30,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  headerRightButton: {
+    marginRight: 5,
+    padding: 5,
+    borderRadius: 30,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

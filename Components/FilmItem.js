@@ -1,76 +1,151 @@
 import React, { useState, useMemo } from "react";
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import { getImage } from "../API/TMDBApi";
-import FadIn from "../Animations/FadIn";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
+import Layout from "../Constants/Layout";
 
-const FilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
+const SPACING = 10;
+const IMAGE_SIZE = 180;
+const ITEM_SIZE = IMAGE_SIZE + SPACING * 2;
+const height = Layout.window.height - 110;
+
+const FilmItem = ({
+  film,
+  isFilmFavorite,
+  isAlreadySeen,
+  displayFilmDetail,
+  index,
+  scrollY,
+}) => {
+  const position = Animated.subtract(index * ITEM_SIZE, scrollY);
+  const isDisappearing = -ITEM_SIZE;
+  const isTop = 0;
+  const isBottom = height - ITEM_SIZE;
+  const isAppearing = height;
+
+  const translateY = Animated.add(
+    Animated.add(
+      scrollY,
+      scrollY.interpolate({
+        inputRange: [0, 0.00001 + index * ITEM_SIZE],
+        outputRange: [0, -index * ITEM_SIZE],
+        extrapolateRight: "clamp",
+      })
+    ),
+    position.interpolate({
+      inputRange: [isBottom, isAppearing],
+      outputRange: [0, -ITEM_SIZE / 4],
+      extrapolate: "clamp",
+    })
+  );
+
+  const scale = position.interpolate({
+    inputRange: [isDisappearing, isTop, isBottom, isAppearing],
+    outputRange: [0.5, 1, 1, 0.5],
+    extrapolate: "clamp",
+  });
+
+  const opacity = position.interpolate({
+    inputRange: [isDisappearing, isTop, isBottom, isAppearing],
+    outputRange: [0.5, 1, 1, 0.5],
+  });
 
   const _displayFavoriteImage = () => {
     if (isFilmFavorite) {
-      return (
-        <Ionicons
-          style={styles.favoriteImage}
-          size={20}
-          name="heart"
-          color="orange"
-        />
-      );
+      return <Ionicons size={20} name="heart" color="orange" />;
     }
+  };
+
+  const _displaySeenImage = () => {
+    if (isAlreadySeen) {
+      return <Ionicons size={20} name="eye" color="orange" />;
+    }
+  };
+
+  const _displayIcons = () => {
+    return (
+      <View style={styles.posterIcons}>
+        {_displayFavoriteImage()}
+        {_displaySeenImage()}
+      </View>
+    );
   };
 
   return useMemo(() => {
     return (
-    <FadIn>
-      <TouchableOpacity
-        style={styles.mainContainer}
-        onPress={() => displayFilmDetail(film.id)}
+      <Animated.View
+        style={{ opacity, transform: [{ translateY }, { scale }] }}
       >
-        <View>
-          <Image
-            style={styles.image}
-            source={{ uri: getImage(film.poster_path) }}
-          />
-          {_displayFavoriteImage()}
-        </View>
+        <TouchableOpacity
+          style={styles.mainContainer}
+          onPress={() => displayFilmDetail(film.id)}
+        >
+          <View>
+            <Image
+              style={styles.image}
+              source={{ uri: getImage(film.poster_path) }}
+            />
+            {_displayIcons()}
+          </View>
 
-        <View style={styles.contentContainer}>
-          <View style={styles.headerContainer}>
-            <Text style={styles.title} numberOfLines={2}>{film.title}</Text>
-            <Text style={styles.vote}>{film.vote_average}</Text>
+          <View style={styles.contentContainer}>
+            <View style={styles.headerContainer}>
+              <Text style={styles.title} numberOfLines={2}>
+                {film.title}
+              </Text>
+              <Text style={styles.vote}>{film.vote_average}</Text>
+            </View>
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.description} numberOfLines={4}>
+                {film.overview}
+              </Text>
+            </View>
+            <View style={styles.dateContainer}>
+              <Text style={styles.date}>
+                Date de sortie:{" "}
+                {moment(new Date(film.release_date)).format("YYYY")}
+              </Text>
+            </View>
           </View>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.description} numberOfLines={5}>
-              {film.overview}
-            </Text>
-          </View>
-          <View style={styles.dateContainer}>
-            <Text style={styles.date}>Date de sortie: {moment(new Date(film.release_date)).format("YYYY")}</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    </FadIn>
-  );
-  }, [film])
-  
-}
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  }, [film, isFilmFavorite, isAlreadySeen]);
+};
 
 const styles = StyleSheet.create({
   mainContainer: {
-    height: 190,
+    flex: 1,
     flexDirection: "row",
-    marginBottom: 5,
+    borderRadius: SPACING,
+    overflow: "hidden",
+    marginVertical: SPACING,
+    shadowColor: "#000",
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    backgroundColor: "white",
+    elevation: 4,
   },
   image: {
-    height: 180,
+    height: IMAGE_SIZE,
     width: 120,
-    margin: 5,
     backgroundColor: "grey",
   },
   contentContainer: {
     flex: 1,
-    margin: 5,
+    marginHorizontal: SPACING,
   },
   headerContainer: {
     flex: 3,
@@ -81,7 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     flex: 1,
     flexWrap: "wrap",
-    paddingRight: 5,
+    paddingRight: SPACING,
   },
   text: {
     fontWeight: "bold",
@@ -107,11 +182,12 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontSize: 14,
   },
-  favoriteImage: {
+  posterIcons: {
+    flexDirection: "row",
     position: "absolute",
-    bottom: 12,
-    right: 12,
+    bottom: 0,
+    right: 2,
   },
 });
 
-export default (FilmItem);
+export default FilmItem;

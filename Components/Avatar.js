@@ -12,11 +12,11 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
-import Layout from "../Constants/Layout";
+import Bounce from "../Animations/Bounce";
 
 const Avatar = ({ navigation, dispatch, avatar }) => {
+  const [avatarIsTouched, setAvatarIsTouched] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
-  const height = Layout.window.height;
 
   const _showImagePicker = async () => {
     const permissionResult =
@@ -67,7 +67,8 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
   return (
     <>
       <Modal
-        animationType="slide"
+        statusBarTranslucent={true}
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={_toggleModal}
@@ -106,8 +107,15 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      <TouchableOpacity style={styles.touchableOpacity} onPress={_toggleModal}>
+      <TouchableOpacity 
+        style={styles.touchableOpacity} 
+        onPress={_toggleModal}
+        onPressIn={() => setAvatarIsTouched(true)}
+        onPressOut={() => setAvatarIsTouched(false)}
+      >
+      <Bounce isTouched={avatarIsTouched}>
         <Image style={styles.avatar} source={avatar} />
+        </Bounce>
       </TouchableOpacity>
     </>
   );
@@ -115,16 +123,16 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
 
 const styles = StyleSheet.create({
   touchableOpacity: {
-    margin: 5,
-    width: 100,
-    height: 100,
+    marginRight: 20,
+    // width: 100,
+    // height: 100,
     justifyContent: "center",
     alignItems: "center",
   },
   avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderColor: "#9B9B9B",
     borderWidth: 2,
   },

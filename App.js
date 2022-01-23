@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler'
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, useColorScheme } from "react-native";
 import Navigation from "./Navigation/Navigation";
