@@ -11,6 +11,7 @@ import Favorites from "../Screens/Favorites";
 import News from "../Screens/News";
 import Seen from "../Screens/Seen";
 import Modal from "../Components/Modal";
+import Home from "../Screens/Home"
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../Constants/Colors";
 import { Text, Pressable, useColorScheme } from "react-native";
@@ -24,6 +25,53 @@ export default function Navigation({ colorScheme }) {
     </NavigationContainer>
   );
 }
+
+const HomeStack = createStackNavigator();
+
+const HomeStackNavigator = () => {
+  const colorScheme = useColorScheme();
+  return (
+    <HomeStack.Navigator
+      screenOptions={{
+        headerMode: "screen",
+        headerStyle: { backgroundColor: "white" },
+        headerTitleStyle: { fontWeight: "bold" },
+      }}
+    >
+      <HomeStack.Group>
+        <HomeStack.Screen
+          name="HomeScreen"
+          component={Home}
+          options={{
+            headerShown: false,
+            title: "Accueil",
+            headerTitleAlign: "center",
+          }}
+        />
+        <HomeStack.Screen
+          name="SearchScreen"
+          component={Search}
+          options={{
+            headerShown: false,
+            title: "Rechercher",
+            headerTitleAlign: "center",
+          }}
+        />
+        <HomeStack.Screen
+          name="FilmDetail"
+          component={FilmDetail}
+          options={() => ({
+            headerShown: true,
+            // headerTransparent: true,
+            title: "",
+            gestureEnabled: true,
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
+          })}
+        />
+      </HomeStack.Group>
+    </HomeStack.Navigator>
+  );
+};
 
 const SearchStack = createStackNavigator();
 
@@ -66,19 +114,7 @@ const SearchStackNavigator = () => {
             // headerTransparent: true,
             title: "",
             gestureEnabled: true,
-            headerBackImage: () => (
-              <Ionicons
-                name="arrow-back-outline"
-                size={30}
-                color={Colors[colorScheme].text}
-                style={{
-                  marginRight: 15,
-                  borderRadius: 20,
-                  backgroundColor: "white",
-                  padding: 5,
-                }}
-              />
-            ),
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
         />
       </SearchStack.Group>
@@ -132,14 +168,7 @@ const FavoritesStackNavigator = () => {
             headerShown: true,
             title: "",
             gestureEnabled: true,
-            headerBackImage: () => (
-              <Ionicons
-                name="arrow-back-outline"
-                size={30}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            ),
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
         />
       </FavoritesStack.Group>
@@ -186,14 +215,7 @@ const NewsStackNavigator = () => {
             headerShown: true,
             title: "",
             gestureEnabled: true,
-            headerBackImage: () => (
-              <Ionicons
-                name="arrow-back-outline"
-                size={30}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            ),
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
         />
       </NewsStack.Group>
@@ -240,14 +262,7 @@ const SeenStackNavigator = () => {
             headerShown: true,
             title: "",
             gestureEnabled: true,
-            headerBackImage: () => (
-              <Ionicons
-                name="arrow-back-outline"
-                size={30}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            ),
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
         />
       </SeenStack.Group>
@@ -264,9 +279,22 @@ const MovieTabNavigator = () => {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
         tabBarInactiveTintColor: "black",
+        // tabBarActiveBackgroundColor: 'black',
+        // tabBarInactiveBackgroundColor: 'black'
       }}
     >
       <BottomTab.Screen
+        name="Home"
+        component={HomeStackNavigator}
+        options={{
+          headerShown: false,
+          title: "Home",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="search" color={color} />
+          ),
+        }}
+      />
+      {/* <BottomTab.Screen
         name="SearchStack"
         component={SearchStackNavigator}
         options={{
@@ -274,7 +302,7 @@ const MovieTabNavigator = () => {
           title: "Rechercher",
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
         }}
-      />
+      /> */}
       <BottomTab.Screen
         name="NewsStack"
         component={NewsStackNavigator}
@@ -314,4 +342,20 @@ const MovieTabNavigator = () => {
 
 function TabBarIcon(props) {
   return <Ionicons size={30} style={{ marginBottom: -3 }} {...props} />;
+}
+
+function HeaderBackIcon(props) {
+  return (
+    <Ionicons
+      name="arrow-back-outline"
+      size={30}
+      style={{
+        marginRight: 15,
+        borderRadius: 20,
+        backgroundColor: "white",
+        padding: 5,
+      }}
+      {...props}
+    />
+  );
 }

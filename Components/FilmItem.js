@@ -1,63 +1,20 @@
-import React, { useState, useMemo } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Animated,
-} from "react-native";
+import React, { useMemo, useEffect } from "react";
+import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 import { getImage } from "../API/TMDBApi";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import moment from "moment";
-import Layout from "../Constants/Layout";
+import Star from "react-native-star-rating";
 
 const SPACING = 10;
 const IMAGE_SIZE = 180;
-const ITEM_SIZE = IMAGE_SIZE + SPACING * 2;
-const height = Layout.window.height - 110;
 
 const FilmItem = ({
   film,
   isFilmFavorite,
   isAlreadySeen,
   displayFilmDetail,
-  index,
-  scrollY,
 }) => {
-  const position = Animated.subtract(index * ITEM_SIZE, scrollY);
-  const isDisappearing = -ITEM_SIZE;
-  const isTop = 0;
-  const isBottom = height - ITEM_SIZE;
-  const isAppearing = height;
-
-  const translateY = Animated.add(
-    Animated.add(
-      scrollY,
-      scrollY.interpolate({
-        inputRange: [0, 0.00001 + index * ITEM_SIZE],
-        outputRange: [0, -index * ITEM_SIZE],
-        extrapolateRight: "clamp",
-      })
-    ),
-    position.interpolate({
-      inputRange: [isBottom, isAppearing],
-      outputRange: [0, -ITEM_SIZE / 4],
-      extrapolate: "clamp",
-    })
-  );
-
-  const scale = position.interpolate({
-    inputRange: [isDisappearing, isTop, isBottom, isAppearing],
-    outputRange: [0.5, 1, 1, 0.5],
-    extrapolate: "clamp",
-  });
-
-  const opacity = position.interpolate({
-    inputRange: [isDisappearing, isTop, isBottom, isAppearing],
-    outputRange: [0.5, 1, 1, 0.5],
-  });
-
   const _displayFavoriteImage = () => {
     if (isFilmFavorite) {
       return <Ionicons size={20} name="heart" color="orange" />;
@@ -81,13 +38,18 @@ const FilmItem = ({
 
   return useMemo(() => {
     return (
-      <Animated.View
-        style={{ opacity, transform: [{ translateY }, { scale }] }}
+      <TouchableOpacity
+        style={styles.mainContainer}
+        onPress={() => displayFilmDetail(film.id)}
       >
-        <TouchableOpacity
-          style={styles.mainContainer}
-          onPress={() => displayFilmDetail(film.id)}
-        >
+        <Image
+          style={styles.backgroundImage}
+          source={{ uri: getImage(film.backdrop_path) }}
+          resizeMode="cover"
+          blurRadius={10}
+          blurType="light"
+        />
+        <BlurView intensity={100} tint="light" style={styles.blurView}>
           <View>
             <Image
               style={styles.image}
@@ -101,7 +63,17 @@ const FilmItem = ({
               <Text style={styles.title} numberOfLines={2}>
                 {film.title}
               </Text>
-              <Text style={styles.vote}>{film.vote_average}</Text>
+              {/* <Text style={styles.vote}>{film.vote_average}</Text> */}
+            </View>
+            <View style={styles.starsContainer}>
+              <Star
+                disabled={true}
+                maxStars={5}
+                fullStarColor="orange"
+                rating={film.vote_average / 2}
+                starSize={15}
+              />
+              <Text style={styles.voteCount}>({film.vote_count})</Text>
             </View>
             <View style={styles.descriptionContainer}>
               <Text style={styles.description} numberOfLines={4}>
@@ -115,8 +87,8 @@ const FilmItem = ({
               </Text>
             </View>
           </View>
-        </TouchableOpacity>
-      </Animated.View>
+        </BlurView>
+      </TouchableOpacity>
     );
   }, [film, isFilmFavorite, isAlreadySeen]);
 };
@@ -135,13 +107,26 @@ const styles = StyleSheet.create({
       width: 0,
       height: 0,
     },
-    backgroundColor: "white",
+    backgroundColor: "transparent",
     elevation: 4,
+  },
+  blurView: {
+    flex: 1,
+    flexDirection: "row",
   },
   image: {
     height: IMAGE_SIZE,
     width: 120,
     backgroundColor: "grey",
+  },
+  backgroundImage: {
+    flex: 1,
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    right: 0,
+    backgroundColor: "lightgrey",
   },
   contentContainer: {
     flex: 1,
@@ -168,8 +153,16 @@ const styles = StyleSheet.create({
     fontSize: 26,
     color: "#666666",
   },
+  starsContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  voteCount: {
+    marginLeft: 10,
+  },
   descriptionContainer: {
-    flex: 6,
+    flex: 5,
   },
   description: {
     fontStyle: "italic",

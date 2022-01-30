@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Bounce from "../Animations/Bounce";
 
 const Avatar = ({ navigation, dispatch, avatar }) => {
-  const [avatarIsTouched, setAvatarIsTouched] = useState(false)
+  const [avatarIsTouched, setAvatarIsTouched] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
 
   const _showImagePicker = async () => {
@@ -91,7 +91,10 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
                 <Ionicons size={25} name="close" />
               </Pressable>
               <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity style={[styles.button]} onPress={_openCamera}>
+                <TouchableOpacity 
+                  style={[styles.button]} 
+                  onPress={_openCamera}
+                >
                   <Ionicons size={30} name="camera" />
                   <Text>Camera</Text>
                 </TouchableOpacity>
@@ -107,14 +110,14 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-      <TouchableOpacity 
-        style={styles.touchableOpacity} 
+      <TouchableOpacity
+        style={styles.touchableOpacity}
         onPress={_toggleModal}
         onPressIn={() => setAvatarIsTouched(true)}
         onPressOut={() => setAvatarIsTouched(false)}
       >
-      <Bounce isTouched={avatarIsTouched}>
-        <Image style={styles.avatar} source={avatar} />
+        <Bounce isTouched={avatarIsTouched}>
+          <Image style={styles.avatar} source={avatar} />
         </Bounce>
       </TouchableOpacity>
     </>

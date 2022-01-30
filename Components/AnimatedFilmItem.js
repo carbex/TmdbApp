@@ -7,7 +7,7 @@ import moment from "moment";
 const IMAGE_SIZE = 70;
 const SPACING = 20;
 
-const SeenFilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
+const AnimatedFilmItem = ({ film, isFilmFavorite, isAlreadySeen, displayFilmDetail, screen }) => {
   const [toggleDisplay, setToggleDisplay] = useState(false);
 
   const _displayFavoriteImage = () => {
@@ -23,6 +23,31 @@ const SeenFilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
     }
   };
 
+  const _displaySeenImage = () => {
+    if (isAlreadySeen) {
+      return (
+        <Ionicons
+          style={styles.favoriteImage}
+          size={20}
+          name="eye"
+          color="orange"
+        />
+      );
+    }
+  };
+
+  const _displayIcons = () => {
+    if(screen === "favorite") {
+      return (
+        <>{_displaySeenImage()}</>
+      );
+    } else if (screen === "seen") {
+      return (
+        <>{_displayFavoriteImage()}</>
+      )
+    }  
+  };
+
   const _displayText = () => {
     if (toggleDisplay) {
       return (
@@ -31,7 +56,7 @@ const SeenFilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
         </Text>
       );
     } else {
-      return <Text style={styles.text}>{film.title}</Text>;
+      return <Text style={styles.text} numberOfLines={3}>{film.title}</Text>;
     }
   };
 
@@ -46,7 +71,7 @@ const SeenFilmItem = ({ film, isFilmFavorite, displayFilmDetail }) => {
           style={styles.image}
           source={{ uri: getImage(film.poster_path) }}
         />
-        {_displayFavoriteImage()}
+        {_displayIcons()}
       </View>
       <View style={styles.contentContainer}>{_displayText()}</View>
     </TouchableOpacity>
@@ -84,11 +109,11 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: "bold",
-    fontSize: 22,
+    fontSize: 18,
     color: "#666666",
   },
   date: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#666666",
   },
   favoriteImage: {
@@ -98,4 +123,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SeenFilmItem;
+export default AnimatedFilmItem;

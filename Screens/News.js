@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  StyleSheet,
-  View,
-  ActivityIndicator,
-  SafeAreaView,
-  Animated,
+  ActivityIndicator, Animated, SafeAreaView, StyleSheet,
+  View
 } from "react-native";
 import { getNewFilms } from "../API/TMDBApi";
 import FilmList from "../Components/FilmList";
@@ -37,7 +34,7 @@ const News = ({ navigation }) => {
     if (newFilms.length === 0) {
       _loadFilms();
     }
-  }, [newFilms]);
+  },[]);
 
   const _displayLoading = () => {
     if (isLoading) {

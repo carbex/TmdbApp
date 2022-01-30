@@ -1,68 +1,42 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  StyleSheet,
-  TextInput,
-  View,
   ActivityIndicator,
-  SafeAreaView,
-  Pressable,
-  Text,
-  StatusBar,
   Animated,
-  TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+  TouchableWithoutFeedback
 } from "react-native";
-import { getFilms } from "../API/TMDBApi";
 import { connect } from "react-redux";
+import { getFilms } from "../API/TMDBApi";
 import FilmList from "../Components/FilmList";
+import SearchItem from "../Components/SearchItem";
 import { Ionicons } from "@expo/vector-icons";
 
 const SPACING = 20;
 const HEADER_MAX_HEIGHT = 120;
 const HEADER_MIN_HEIGHT = 55;
 
-const Search = ({ navigation }) => {
+const Search = ({ navigation, route }) => {
+  const { text } = route.params;
   const [searchedText, setSearchedText] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [films, setFilms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-
-  const scrollY = useRef(new Animated.Value(0)).current;
-  
-  const _onScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: false }
-  )
-
-  // Header animation
-  const searchSectionPadding = scrollY.interpolate({
-    inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
-    outputRange: [15, 4],
-    extrapolate: 'clamp'
-  });
-
-  const headerHeight = scrollY.interpolate({
-    inputRange: [0, HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT],
-    outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
-    extrapolate: 'clamp'
-  });
-
-
   // Load searched films
   const _loadFilms = async () => {
     if (searchedText.length > 0) {
       setIsLoading(true);
-      try {
-        const data = await getFilms(searchedText, page + 1);
-        if (data) {
-          setPage(data.page);
-          setTotalPages(data.total_pages);
-          setFilms([...films, ...data.results]);
-          setIsLoading(false);
-      }
-      } catch (error) {
-        console.log(error)
+      const data = await getFilms(searchedText, page + 1);
+      if (data) {
+        setPage(data.page);
+        setTotalPages(data.total_pages);
+        setFilms([...films, ...data.results]);
+        setIsLoading(false);
       }
     }
   };
@@ -81,6 +55,15 @@ const Search = ({ navigation }) => {
     }
   }, [films]);
 
+  useEffect(() => {
+    if(text.length > 0) {
+      setSearchedText(text)
+      setPage(0);
+      setTotalPages(0);
+      setFilms([]);
+    } 
+  }, [text]) 
+
   const _searchTextInputChanged = (text) => {
     setSearchedText(text);
   };
@@ -95,47 +78,38 @@ const Search = ({ navigation }) => {
     }
   };
 
+  const _goBack = () => {
+    navigation.goBack()
+  }
+
   return (
     <SafeAreaView style={styles.mainContainer}>
-      <Animated.View style={[styles.headerContainer, { height: headerHeight }]}>
-        <Animated.View style={[styles.searchSection, { padding: searchSectionPadding}]}>
+      <View style={styles.headerContainer}>
+        <TouchableWithoutFeedback
+        onPress={_goBack}
+        >
           <Ionicons
-            style={styles.searchIcon}
-            name="search"
-            size={25}
-            color="grey"
+            name="arrow-back-outline"
+            size={30}
+            color="black"
+            style={{
+              // marginRight: 15,
+              borderRadius: 20,
+              backgroundColor: "white",
+              padding: 5,
+            }}
           />
-          <TextInput
-            style={styles.headerTextInput}
-            placeholder="Rechercher sur TMDB APP"
-            onChangeText={(text) => _searchTextInputChanged(text)}
-            onSubmitEditing={() => _searchFilms()}
-            value={searchedText}
+        </TouchableWithoutFeedback>
+        <View style={styles.searchSection}>
+          <SearchItem
+            searchedText={searchedText}
+            searchFilms={_searchFilms}
+            searchTextInputChanged={_searchTextInputChanged}
           />
-          {searchedText !== "" && (
-            <TouchableOpacity
-              onPress={() => _searchTextInputChanged("")}
-            >
-              <Ionicons
-                style={styles.closeIcon}
-                name="close-circle"
-                size={25}
-                color="grey"
-              />
-            </TouchableOpacity>
-          )}
-        </Animated.View>
-        <Text style={styles.headerText}>TMDB APP</Text>
-      </Animated.View>
-      {/* <View style={styles.buttonContainer}>
-          <Pressable style={styles.button} onPress={() => _searchFilms()}>
-            <Text>Rechercher</Text>
-          </Pressable>
-        </View> */}
+        </View>
+      </View>
       <View style={styles.listContainer}>
         <FilmList
-          scrollY={scrollY}
-          onScroll={_onScroll}
           films={[...new Set(films)]}
           navigation={navigation}
           loadFilms={_loadFilms}
@@ -143,7 +117,7 @@ const Search = ({ navigation }) => {
           totalPages={totalPages}
           loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
         />
-      {_displayLoading()}
+        {_displayLoading()}
       </View>
     </SafeAreaView>
   );
@@ -156,12 +130,24 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 42,
   },
   headerContainer: {
-    height: HEADER_MAX_HEIGHT,
-    justifyContent: "flex-end",
+    paddingHorizontal: SPACING / 2,
+    height: 55,
+    flexDirection: 'row',
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    elevation: 10,
+    backgroundColor: "white",
   },
   searchSection: {
-    marginHorizontal: SPACING,
+    flex: 1,
+    padding: 4,
+    marginLeft: SPACING / 2,
     marginVertical: SPACING / 2,
     borderRadius: SPACING / 2,
     flexDirection: "row",
@@ -177,11 +163,10 @@ const styles = StyleSheet.create({
       height: 0,
     },
     elevation: 4,
+    backgroundColor: "white",
   },
-  searchIcon: {
-  },
-  closeIcon: {
-  },
+  searchIcon: {},
+  closeIcon: {},
   headerTextInput: {
     flex: 1,
     paddingHorizontal: SPACING / 2,
@@ -223,7 +208,7 @@ const styles = StyleSheet.create({
     // right: 0,
     // top: 100,
     // bottom: 0,
-    // flex: 1,
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
   },

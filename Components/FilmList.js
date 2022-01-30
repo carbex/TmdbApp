@@ -1,11 +1,9 @@
-import React, { useEffect } from "react";
-import { FlatList, Animated } from "react-native";
-import FilmItem from "./FilmItem";
+import React from "react";
+import { Animated, FlatList, ActivityIndicator, View, StyleSheet } from "react-native";
 import { connect } from "react-redux";
-import FadeIn from "../Animations/FadIn";
+import FilmItem from "./FilmItem";
 
 const SPACING = 20;
-const ITEM_SIZE = 180 + SPACING * 3;
 
 const FilmList = ({
   navigation,
@@ -16,20 +14,16 @@ const FilmList = ({
   favoritesFilm,
   seenFilms,
   loadMoreOnScroll = false,
-  scrollY,
-  onScroll
 }) => {
   const _displayFilmDetail = (idFilm) => {
     navigation.navigate("FilmDetail", { idFilm: idFilm });
   };
 
-  const _renderItem = ({ item, index }) => {
+  function _renderItem({ item, index }) {
     return (
-      // <FadeIn index={index/page}>
       <FilmItem
         film={item}
         index={index}
-        scrollY={scrollY}
         isFilmFavorite={
           favoritesFilm.findIndex((film) => film.id === item.id) !== -1
             ? true
@@ -42,20 +36,17 @@ const FilmList = ({
         }
         displayFilmDetail={_displayFilmDetail}
       />
-      // </FadeIn>
     );
-  };
+  }
 
   return (
-    <Animated.FlatList
+    <FlatList
       data={films}
       contentContainerStyle={{ paddingHorizontal: SPACING }}
       extraData={favoritesFilm}
       keyExtractor={(_, index) => String(index)}
       renderItem={_renderItem}
-      scrollEventThrottle={16}
-      onScroll={onScroll}
-      onEndReachedThreshold={100}
+      onEndReachedThreshold={1}
       onEndReached={() => {
         if (loadMoreOnScroll && page < totalPages) {
           loadFilms();

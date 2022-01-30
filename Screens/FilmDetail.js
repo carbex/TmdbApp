@@ -6,28 +6,25 @@ import {
   ActivityIndicator,
   ScrollView,
   Image,
-  TouchableOpacity,
   SafeAreaView,
   Share,
-  StatusBar
 } from "react-native";
-import { getFilmDetail, getImage } from "../API/TMDBApi";
-import moment from "moment";
-import numeral from "numeral";
+import { getMovieDetail, getTvDetail, getImage } from "../API/TMDBApi";
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
-// import EnlargeShrink from "../Animations/EnlargeShrink";
-import Bounce from "../Animations/Bounce";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import moment from "moment";
+import numeral from "numeral";
+import Bounce from "../Animations/Bounce";
 
 const FilmDetail = ({
-  navigation,
-  route,
   dispatch,
   favoritesFilm,
+  navigation,
+  route,
   seenFilms,
 }) => {
-  const { idFilm } = route.params;
+  const { idFilm, filmsType } = route.params;
   const [film, setFilm] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [heartIsTouched, setHeartIsTouched] = useState(false);
@@ -35,7 +32,7 @@ const FilmDetail = ({
 
   const _shareFilm = async () => {
     setIsLoading(true);
-    await Share.share({ title: film.title, message: film.overview });
+    await Share.share({ title: (film.title ? film.title : film.name), message: film.overview });
     setIsLoading(false);
   };
 
@@ -74,12 +71,12 @@ const FilmDetail = ({
       },
     });
   }, [
-    navigation,
-    favoritesFilm,
-    seenFilms,
-    heartIsTouched,
     eyeIsTouched,
+    favoritesFilm,
     film,
+    heartIsTouched,
+    navigation,
+    seenFilms,
   ]);
 
   const _displayLoading = () => {
@@ -94,7 +91,12 @@ const FilmDetail = ({
 
   useEffect(() => {
     const getFilm = async () => {
-      const data = await getFilmDetail(idFilm);
+      let data = {}
+      if(filmsType === 'tv') {
+        data = await getTvDetail(idFilm);
+      } else {
+        data = await getMovieDetail(idFilm);
+      }
       if (data) {
         setFilm(data);
         setIsLoading(false);
@@ -145,7 +147,7 @@ const FilmDetail = ({
     );
   };
 
-  const _displayFilm = () => {
+  const _displayMovie = () => {
     if (film !== undefined) {
       return (
         <>
@@ -155,37 +157,78 @@ const FilmDetail = ({
               source={{ uri: getImage(film.backdrop_path) }}
             />
             <View style={styles.bodyContainer}>
-              <Text style={styles.title_text}>{film.title}</Text>
-              <Text style={styles.description_text}>{film.overview}</Text>
-              <Text style={styles.default_text}>
-                Sorti le :{" "}
-                {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
-              </Text>
-              <Text style={styles.default_text}>
-                Note : {film.vote_average} / 10
-              </Text>
-              <Text style={styles.default_text}>
-                Nombre de votes : {film.vote_count}
-              </Text>
-              <Text style={styles.default_text}>
-                Budget : {numeral(film.budget).format("0,0[.]00 $")}
-              </Text>
-              <Text style={styles.default_text}>
-                Genre(s) :{" "}
-                {film.genres
-                  .map(function (genre) {
-                    return genre.name;
-                  })
-                  .join(" / ")}
-              </Text>
-              <Text style={styles.default_text}>
-                Companie(s) :{" "}
-                {film.production_companies
-                  .map(function (company) {
-                    return company.name;
-                  })
-                  .join(" / ")}
-              </Text>
+                <Text style={styles.title_text}>{film.title}</Text>
+                <Text style={styles.description_text}>{film.overview}</Text>
+                <Text style={styles.default_text}>
+                  Sorti le :{" "}
+                  {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
+                </Text>
+                <Text style={styles.default_text}>
+                  Note : {film.vote_average} / 10
+                </Text>
+                <Text style={styles.default_text}>
+                  Nombre de votes : {film.vote_count}
+                </Text>
+                <Text style={styles.default_text}>
+                  Budget : {numeral(film.budget).format("0,0[.]00 $")}
+                </Text>
+                <Text style={styles.default_text}>
+                  Genre(s) :{" "}
+                  {film.genres
+                    .map(function (genre) {
+                      return genre.name;
+                    })
+                    .join(" / ")}
+                </Text>
+                <Text style={styles.default_text}>
+                  Companie(s) :{" "}
+                  {film.production_companies
+                    .map(function (company) {
+                      return company.name;
+                    })
+                    .join(" / ")}
+                </Text>
+            </View>
+          </ScrollView>
+        </>
+      );
+    }
+  };
+
+  const _displayTv = () => {
+    if (film !== undefined) {
+      return (
+        <>
+          <ScrollView style={styles.scrollViewContainer}>
+            <Image
+              style={styles.image}
+              source={{ uri: getImage(film.backdrop_path) }}
+            />
+            <View style={styles.bodyContainer}>
+                <Text style={styles.title_text}>{film.name}</Text>
+                <Text style={styles.description_text}>{film.overview}</Text>
+                <Text style={styles.default_text}>
+                  Note : {film.vote_average} / 10
+                </Text>
+                <Text style={styles.default_text}>
+                  Nombre de votes : {film.vote_count}
+                </Text>
+                <Text style={styles.default_text}>
+                  Genre(s) :{" "}
+                  {film.genres
+                    .map(function (genre) {
+                      return genre.name;
+                    })
+                    .join(" / ")}
+                </Text>
+                <Text style={styles.default_text}>
+                  Companie(s) :{" "}
+                  {film.production_companies
+                    .map(function (company) {
+                      return company.name;
+                    })
+                    .join(" / ")}
+                </Text>
             </View>
           </ScrollView>
         </>
@@ -196,7 +239,7 @@ const FilmDetail = ({
   return (
     <SafeAreaView style={styles.mainContainer}>
       {/* <StatusBar translucent backgroundColor="rgba(0,0,0,0.4)" barStyle="light-content"/> */}
-      {_displayFilm()}
+      {filmsType === 'tv' ? _displayTv() : _displayMovie()}
       {_displayLoading()}
     </SafeAreaView>
   );
@@ -226,6 +269,7 @@ const styles = StyleSheet.create({
   image: {
     height: 300,
     resizeMode: "cover",
+    backgroundColor: "lightgrey",
   },
   title_text: {
     fontWeight: "bold",
