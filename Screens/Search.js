@@ -110,6 +110,7 @@ const Search = ({ navigation, route }) => {
       </View>
       <View style={styles.listContainer}>
         <FilmList
+          horizontal={false}
           films={[...new Set(films)]}
           navigation={navigation}
           loadFilms={_loadFilms}

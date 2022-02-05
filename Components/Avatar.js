@@ -64,6 +64,13 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
     setModalVisible(!modalVisible);
   };
 
+  const MyButton = ({callBack, title, iconTitle}) => {
+    <TouchableOpacity style={[styles.button]} onPress={callBack}>
+      <Ionicons size={30} name="camera" />
+      <Text>Camera</Text>
+    </TouchableOpacity>;
+  };
+
   return (
     <>
       <Modal
@@ -91,10 +98,7 @@ const Avatar = ({ navigation, dispatch, avatar }) => {
                 <Ionicons size={25} name="close" />
               </Pressable>
               <View style={{ flexDirection: "row" }}>
-                <TouchableOpacity 
-                  style={[styles.button]} 
-                  onPress={_openCamera}
-                >
+                <TouchableOpacity style={[styles.button]} onPress={_openCamera}>
                   <Ionicons size={30} name="camera" />
                   <Text>Camera</Text>
                 </TouchableOpacity>

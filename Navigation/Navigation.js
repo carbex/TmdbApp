@@ -10,8 +10,10 @@ import FilmDetail from "../Screens/FilmDetail";
 import Favorites from "../Screens/Favorites";
 import News from "../Screens/News";
 import Seen from "../Screens/Seen";
+import WishList from "../Screens/WishList"
 import Modal from "../Components/Modal";
 import Home from "../Screens/Home"
+import More from "../Screens/More"
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../Constants/Colors";
 import { Text, Pressable, useColorScheme } from "react-native";
@@ -67,6 +69,15 @@ const HomeStackNavigator = () => {
             gestureEnabled: true,
             headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
+        />
+        <HomeStack.Screen
+          name="MoreScreen"
+          component={More}
+          options={{
+            headerShown: true,
+            title: "More",
+            headerTitleAlign: "center",
+          }}
         />
       </HomeStack.Group>
     </HomeStack.Navigator>
@@ -270,6 +281,54 @@ const SeenStackNavigator = () => {
   );
 };
 
+const WishListStack = createStackNavigator();
+
+const WishListStackNavigator = () => {
+  const colorScheme = useColorScheme();
+  return (
+    <WishListStack.Navigator
+      screenOptions={{
+        headerMode: "screen",
+        headerStyle: { backgroundColor: "white" },
+        headerTitleStyle: { fontWeight: "bold" },
+        headerStyle: {
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 4.84,
+          elevation: 12,
+        },
+      }}
+    >
+      <WishListStack.Group>
+        <WishListStack.Screen
+          name="WishListScreen"
+          component={WishList}
+          options={{
+            headerShown: true,
+            title: "Ma liste",
+            headerTitleAlign: "center",
+          }}
+        />
+        <WishListStack.Screen
+          name="FilmDetail"
+          component={FilmDetail}
+          options={() => ({
+            headerShown: true,
+            title: "",
+            gestureEnabled: true,
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
+          })}
+        />
+      </WishListStack.Group>
+    </WishListStack.Navigator>
+  );
+};
+
+
 const BottomTab = createBottomTabNavigator();
 
 const MovieTabNavigator = () => {
@@ -303,7 +362,7 @@ const MovieTabNavigator = () => {
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
         }}
       /> */}
-      <BottomTab.Screen
+      {/* <BottomTab.Screen
         name="NewsStack"
         component={NewsStackNavigator}
         options={{
@@ -313,7 +372,7 @@ const MovieTabNavigator = () => {
             <TabBarIcon name="film-outline" color={color} />
           ),
         }}
-      />
+      /> */}
       <BottomTab.Screen
         name="FavoritesStack"
         component={FavoritesStackNavigator}
@@ -333,6 +392,17 @@ const MovieTabNavigator = () => {
           title: "Vu",
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="eye-outline" color={color} />
+          ),
+        }}
+      />
+      <BottomTab.Screen
+        name="WishListStack"
+        component={WishListStackNavigator}
+        options={{
+          headerShown: false,
+          title: "Ma liste",
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="bookmark-outline" color={color} />
           ),
         }}
       />

@@ -65,7 +65,8 @@ export const getNowPlaying = async(page) => {
     }
 }
 
-export const getPopular = async(page, type) => {
+export const getPopular = async(page, type="movie") => {
+
     try {
         const url = 'https://api.themoviedb.org/3/' + type + '/popular?api_key=' + API_TOKEN + '&language=fr-FR&page=' + page
         const response = await axios.get(url)

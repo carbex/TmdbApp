@@ -17,7 +17,10 @@ import {
   getTopRated,
 } from "../API/TMDBApi";
 import HorizontalFilmList from "../Components/HorizontalFilmList";
+import FilmList from "../Components/FilmList";
 import SearchItem from "../Components/SearchItem";
+import { Ionicons } from "@expo/vector-icons";
+
 // import { TouchableOpacity } from "react-native-gesture-handler";
 
 // utiliser webview et react-native-youtube-iframe
@@ -78,6 +81,10 @@ const Home = ({ navigation }) => {
   const _searchFilms = () => {
     navigation.navigate("SearchScreen", { text: searchedText });
     setSearchedText("");
+  };
+
+  const _moreFilms = (type) => {
+    navigation.navigate("MoreScreen", { type: type });
   };
 
   const _searchTextInputChanged = (text) => {
@@ -170,6 +177,28 @@ const Home = ({ navigation }) => {
     setPopularFilms([]);
   };
 
+  const ListHeader = ({ title, type }) => {
+    return (
+      <View style={styles.listHeader}>
+        <Text style={styles.listHeaderText}>{title}</Text>
+        <TouchableOpacity
+        onPress={() => _moreFilms(type)}
+        >
+          <Ionicons
+            name="arrow-forward-outline"
+            size={30}
+            color="black"
+            style={{
+              borderRadius: 40,
+              backgroundColor: "white",
+              padding: 5,
+            }}
+          />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <Animated.View
@@ -191,38 +220,55 @@ const Home = ({ navigation }) => {
       </Animated.View>
       <ScrollView
         scrollEventThrottle={0.1}
-        contentContainerStyle={{ paddingTop: 50 }}
+        contentContainerStyle={{ paddingTop: 70, backgroundColor: 'white' }}
         onScroll={_onScroll}
       >
         <View style={styles.listContainer}>
-          <View style={styles.listHeader}>
-            <Text style={styles.listHeaderText}>Films à l'affiche</Text>
-          </View>
-          <HorizontalFilmList
+          <ListHeader title="Films à l'affiche" type="nowPlaying"/>
+          <FilmList
+            horizontal={true}
+            films={[...new Set(nowPlayingFilms)]}
             navigation={navigation}
-            films={nowPlayingFilms}
+            loadFilms={_loadNowPlayingFilms}
             page={nowPlayingPage}
             totalPages={nowPlayingTotalPages}
-            maxPage={2}
-            loadFilms={_loadNowPlayingFilms}
+            maxPages={1}
+            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
           />
           {isNowPlayingLoading && _displayLoading()}
         </View>
+
         <View style={styles.listContainer}>
-          <View style={styles.listHeader}>
-            <Text style={styles.listHeaderText}>Films bientôt à l'affiche</Text>
-          </View>
-          <HorizontalFilmList
+          <ListHeader title="Films bientôt à l'affiche" type="upcoming" />
+          <FilmList
+            horizontal={true}
+            films={[...new Set(upcomingFilms)]}
             navigation={navigation}
-            films={upcomingFilms}
+            loadFilms={_loadUpcomingFilms}
             page={upcomingPage}
             totalPages={upcomingTotalPages}
-            maxPage={2}
-            loadFilms={_loadUpcomingFilms}
+            maxPages={1}
+            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
           />
           {isUpcomingLoading && _displayLoading()}
         </View>
+
         <View style={styles.listContainer}>
+          <ListHeader title="Films populaires" type="popular"/>
+          <FilmList
+            horizontal={true}
+            films={[...new Set(popularFilms)]}
+            navigation={navigation}
+            loadFilms={_loadPopularFilms}
+            page={popularPage}
+            totalPages={popularTotalPages}
+            maxPages={1}
+            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
+          />
+          {isPopularLoading && _displayLoading()}
+        </View>
+
+        {/* <View style={styles.listContainer}>
           <View style={styles.listHeader}>
             <Text style={styles.listHeaderText}>Films populaires</Text>
             <View style={{ flexDirection: "row" }}>
@@ -248,18 +294,19 @@ const Home = ({ navigation }) => {
             loadFilms={_loadPopularFilms}
           />
           {isPopularLoading && _displayLoading()}
-        </View>
+        </View> */}
+
         <View style={styles.listContainer}>
-          <View style={styles.listHeader}>
-            <Text style={styles.listHeaderText}>Films les mieux notés</Text>
-          </View>
-          <HorizontalFilmList
+          <ListHeader title="Films les mieux notés" type="topRated"/>
+          <FilmList
+            horizontal={true}
+            films={[...new Set(topRatedFilms)]}
             navigation={navigation}
-            films={topRatedFilms}
+            loadFilms={_loadTopRatedFilms}
             page={topRatedPage}
             totalPages={topRatedTotalPages}
-            maxPage={2}
-            loadFilms={_loadTopRatedFilms}
+            maxPages={1}
+            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
           />
           {isTopRatedLoading && _displayLoading()}
         </View>
@@ -278,7 +325,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    minHeight: 350,
+    // minHeight: 350,
   },
   loadingContainer: {
     position: "absolute",
@@ -291,7 +338,9 @@ const styles = StyleSheet.create({
   },
   listHeader: {
     flexDirection: "row",
-    padding: SPACING,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: SPACING,
   },
   listHeaderText: {
     fontSize: 20,

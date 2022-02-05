@@ -4,28 +4,26 @@ import moment from "moment";
 import { getImage } from "../API/TMDBApi";
 
 const SPACING = 20;
-const IMAGE_HEIGHT = 200;
-const IMAGE_WIDTH = 140;
+const IMAGE_HEIGHT = 160;
+const IMAGE_WIDTH = 100;
 
 const HorizontalFilmItem = ({ film, displayFilmDetail }) => {
   return useMemo(() => {
     return (
-        <TouchableOpacity
+      <TouchableOpacity
         style={styles.itemContainer}
         onPress={() => displayFilmDetail(film.id)}
       >
-      {/* <View style={styles.itemContainer}> */}
         <Image
           style={styles.itemImage}
           source={{ uri: getImage(film.poster_path) }}
         />
-        <View style={styles.itemBody}>
+        {/* <View style={styles.itemBody}>
           <Text style={styles.itemTitle}>{film.title}</Text>
           <Text style={styles.itemDate}>
             {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
           </Text>
-        </View>
-      {/* </View> */}
+        </View> */}
       </TouchableOpacity>
     );
   }, [film]);

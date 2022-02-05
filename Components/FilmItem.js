@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: SPACING,
     overflow: "hidden",
-    marginVertical: SPACING,
+    margin: SPACING,
     shadowColor: "#000",
     shadowOpacity: 1,
     shadowRadius: 20,

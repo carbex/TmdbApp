@@ -119,6 +119,11 @@ const FilmDetail = ({
     dispatch(action);
   };
 
+  const _toggleWishList= () => {
+    const action = { type: "TOGGLE_WISHLIST", value: film };
+    dispatch(action);
+  };
+
   const _displayFavoriteImage = () => {
     let iconName = "heart-outline";
     let color = "black";
