@@ -13,18 +13,28 @@ const FilmItem = ({
   film,
   isFilmFavorite,
   isAlreadySeen,
+  isIntoWishList,
   displayFilmDetail,
 }) => {
   const _displayFavoriteImage = () => {
     if (isFilmFavorite) {
       return <Ionicons size={20} name="heart" color="orange" />;
     }
+    return <Ionicons size={20} name="heart-outline" color="grey" />;
   };
 
   const _displaySeenImage = () => {
     if (isAlreadySeen) {
       return <Ionicons size={20} name="eye" color="orange" />;
     }
+    return <Ionicons size={20} name="eye-outline" color="grey" />;
+  };
+
+  const _displayWishListImage = () => {
+    if (isIntoWishList) {
+      return <Ionicons size={20} name="bookmark" color="orange" />;
+    }
+    return <Ionicons size={20} name="bookmark-outline" color="grey" />;
   };
 
   const _displayIcons = () => {
@@ -32,6 +42,7 @@ const FilmItem = ({
       <View style={styles.posterIcons}>
         {_displayFavoriteImage()}
         {_displaySeenImage()}
+        {_displayWishListImage()}
       </View>
     );
   };

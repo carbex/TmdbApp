@@ -3,7 +3,7 @@ function toggleWishList(state = { wishListFilms: [] }, action) {
     switch(action.type) {
         case 'TOGGLE_WISHLIST':
             const wishListFilmIndex = state.wishListFilms.findIndex(item => item.id === action.value.id)
-            if(seenFilmIndex !== -1) {
+            if(wishListFilmIndex !== -1) {
                 newState = {
                     ...state,
                     wishListFilms: state.wishListFilms.filter((item, index) => index !== wishListFilmIndex)

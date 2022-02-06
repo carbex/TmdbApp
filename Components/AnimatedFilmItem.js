@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { getImage } from "../API/TMDBApi";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
@@ -7,7 +13,13 @@ import moment from "moment";
 const IMAGE_SIZE = 70;
 const SPACING = 20;
 
-const AnimatedFilmItem = ({ film, isFilmFavorite, isAlreadySeen, displayFilmDetail, screen }) => {
+const AnimatedFilmItem = ({
+  film,
+  isFilmFavorite,
+  isAlreadySeen,
+  displayFilmDetail,
+  screen,
+}) => {
   const [toggleDisplay, setToggleDisplay] = useState(false);
 
   const _displayFavoriteImage = () => {
@@ -37,15 +49,11 @@ const AnimatedFilmItem = ({ film, isFilmFavorite, isAlreadySeen, displayFilmDeta
   };
 
   const _displayIcons = () => {
-    if(screen === "favorite") {
-      return (
-        <>{_displaySeenImage()}</>
-      );
+    if (screen === "favorite") {
+      return <>{_displaySeenImage()}</>;
     } else if (screen === "seen") {
-      return (
-        <>{_displayFavoriteImage()}</>
-      )
-    }  
+      return <>{_displayFavoriteImage()}</>;
+    }
   };
 
   const _displayText = () => {
@@ -56,7 +64,11 @@ const AnimatedFilmItem = ({ film, isFilmFavorite, isAlreadySeen, displayFilmDeta
         </Text>
       );
     } else {
-      return <Text style={styles.text} numberOfLines={3}>{film.title}</Text>;
+      return (
+        <Text style={styles.text} numberOfLines={3}>
+          {film.title}
+        </Text>
+      );
     }
   };
 

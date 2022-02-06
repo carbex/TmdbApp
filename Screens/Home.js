@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    // minHeight: 350,
+    minHeight: 160,
   },
   loadingContainer: {
     position: "absolute",

@@ -16,6 +16,7 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import moment from "moment";
 import numeral from "numeral";
 import Bounce from "../Animations/Bounce";
+import { Header } from "react-native/Libraries/NewAppScreen";
 
 const FilmDetail = ({
   dispatch,
@@ -23,16 +24,21 @@ const FilmDetail = ({
   navigation,
   route,
   seenFilms,
+  wishListFilms,
 }) => {
   const { idFilm, filmsType } = route.params;
   const [film, setFilm] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [heartIsTouched, setHeartIsTouched] = useState(false);
   const [eyeIsTouched, setEyeIsTouched] = useState(false);
+  const [bookmarkIsTouched, setBookmarkIsTouched] = useState(false);
 
   const _shareFilm = async () => {
     setIsLoading(true);
-    await Share.share({ title: (film.title ? film.title : film.name), message: film.overview });
+    await Share.share({
+      title: film.title ? film.title : film.name,
+      message: film.overview,
+    });
     setIsLoading(false);
   };
 
@@ -50,20 +56,46 @@ const FilmDetail = ({
                 <Ionicons size={30} name="share-social" color="black" />
               </TouchableWithoutFeedback>
               <TouchableWithoutFeedback
-                style={styles.favoriteContainer}
-                onPress={() => _toggleFavorite()}
+                style={styles.headerRightButton}
+                onPress={() => _toggle("TOGGLE_FAVORITE")}
                 onPressIn={() => setHeartIsTouched(true)}
                 onPressOut={() => setHeartIsTouched(false)}
               >
-                {_displayFavoriteImage()}
+                {_displayImage(
+                  favoritesFilm,
+                  heartIsTouched,
+                  "heart",
+                  "orange",
+                  "black"
+                )}
               </TouchableWithoutFeedback>
               <TouchableWithoutFeedback
-                style={styles.seenContainer}
-                onPress={() => _toggleSeen()}
+                style={styles.headerRightButton}
+                onPress={() => _toggle("TOGGLE_SEEN")}
                 onPressIn={() => setEyeIsTouched(true)}
                 onPressOut={() => setEyeIsTouched(false)}
               >
-                {_displaySeenImage()}
+                {_displayImage(
+                  seenFilms,
+                  eyeIsTouched,
+                  "eye",
+                  "orange",
+                  "black"
+                )}
+              </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                style={styles.headerRightButton}
+                onPress={() => _toggle("TOGGLE_WISHLIST")}
+                onPressIn={() => setBookmarkIsTouched(true)}
+                onPressOut={() => setBookmarkIsTouched(false)}
+              >
+                {_displayImage(
+                  wishListFilms,
+                  bookmarkIsTouched,
+                  "bookmark",
+                  "orange",
+                  "black"
+                )}
               </TouchableWithoutFeedback>
             </View>
           );
@@ -71,12 +103,14 @@ const FilmDetail = ({
       },
     });
   }, [
+    bookmarkIsTouched,
     eyeIsTouched,
     favoritesFilm,
     film,
     heartIsTouched,
     navigation,
     seenFilms,
+    wishListFilms,
   ]);
 
   const _displayLoading = () => {
@@ -91,8 +125,8 @@ const FilmDetail = ({
 
   useEffect(() => {
     const getFilm = async () => {
-      let data = {}
-      if(filmsType === 'tv') {
+      let data = {};
+      if (filmsType === "tv") {
         data = await getTvDetail(idFilm);
       } else {
         data = await getMovieDetail(idFilm);
@@ -105,48 +139,28 @@ const FilmDetail = ({
     getFilm();
   }, [idFilm]);
 
-  const _toggleFavorite = () => {
-    const action = { type: "TOGGLE_FAVORITE", value: film }; //Creation action avec le type et la valeur
-    dispatch(action); // On passe l'action au store
-    // Le store donne l'action à un reducer capable de gérer l'action de type 'TOGGLE_FAVORITE'
-    // Le reducer reçoit l'action et modifie le state
-    // Redux va détecter un changement dans le store et va envoyer la nouvelle liste de films favoris aux composants abonnés à ce changement
-    // Les composants abonnés reçoivent la liste des nouveaux films favoris, la mappe à leurs props et re-rend
-  };
-
-  const _toggleSeen = () => {
-    const action = { type: "TOGGLE_SEEN", value: film };
+  // Action type send to reducers (TOGGLE_FAVORITE, TOGGLE_SEEN, TOGGLE_WISHLIST)
+  const _toggle = (type) => {
+    const action = { type, value: film };
     dispatch(action);
   };
 
-  const _toggleWishList= () => {
-    const action = { type: "TOGGLE_WISHLIST", value: film };
-    dispatch(action);
-  };
-
-  const _displayFavoriteImage = () => {
-    let iconName = "heart-outline";
-    let color = "black";
-    if (favoritesFilm.findIndex((item) => item.id === film.id) !== -1) {
-      iconName = "heart";
-      color = "orange";
+  // Header icons
+  const _displayImage = (
+    films,
+    iconIsTouched,
+    activeIconName,
+    activeColor,
+    inactiveColor
+  ) => {
+    let iconName = `${activeIconName}-outline`;
+    let color = inactiveColor;
+    if (films.findIndex((item) => item.id === film.id) !== -1) {
+      iconName = activeIconName;
+      color = activeColor;
     }
     return (
-      <Bounce isTouched={heartIsTouched}>
-        <Ionicons size={30} name={iconName} color={color} />
-      </Bounce>
-    );
-  };
-
-  const _displaySeenImage = () => {
-    let iconName = "eye-outline";
-    let color = "black";
-    if (seenFilms.findIndex((item) => item.id === film.id) !== -1) {
-      iconName = "eye";
-      color = "orange";
-    }
-    return (
-      <Bounce isTouched={eyeIsTouched}>
+      <Bounce isTouched={iconIsTouched}>
         <Ionicons size={30} name={iconName} color={color} />
       </Bounce>
     );
@@ -162,37 +176,37 @@ const FilmDetail = ({
               source={{ uri: getImage(film.backdrop_path) }}
             />
             <View style={styles.bodyContainer}>
-                <Text style={styles.title_text}>{film.title}</Text>
-                <Text style={styles.description_text}>{film.overview}</Text>
-                <Text style={styles.default_text}>
-                  Sorti le :{" "}
-                  {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
-                </Text>
-                <Text style={styles.default_text}>
-                  Note : {film.vote_average} / 10
-                </Text>
-                <Text style={styles.default_text}>
-                  Nombre de votes : {film.vote_count}
-                </Text>
-                <Text style={styles.default_text}>
-                  Budget : {numeral(film.budget).format("0,0[.]00 $")}
-                </Text>
-                <Text style={styles.default_text}>
-                  Genre(s) :{" "}
-                  {film.genres
-                    .map(function (genre) {
-                      return genre.name;
-                    })
-                    .join(" / ")}
-                </Text>
-                <Text style={styles.default_text}>
-                  Companie(s) :{" "}
-                  {film.production_companies
-                    .map(function (company) {
-                      return company.name;
-                    })
-                    .join(" / ")}
-                </Text>
+              <Text style={styles.title_text}>{film.title}</Text>
+              <Text style={styles.description_text}>{film.overview}</Text>
+              <Text style={styles.default_text}>
+                Sorti le :{" "}
+                {moment(new Date(film.release_date)).format("DD/MM/YYYY")}
+              </Text>
+              <Text style={styles.default_text}>
+                Note : {film.vote_average} / 10
+              </Text>
+              <Text style={styles.default_text}>
+                Nombre de votes : {film.vote_count}
+              </Text>
+              <Text style={styles.default_text}>
+                Budget : {numeral(film.budget).format("0,0[.]00 $")}
+              </Text>
+              <Text style={styles.default_text}>
+                Genre(s) :{" "}
+                {film.genres
+                  .map(function (genre) {
+                    return genre.name;
+                  })
+                  .join(" / ")}
+              </Text>
+              <Text style={styles.default_text}>
+                Companie(s) :{" "}
+                {film.production_companies
+                  .map(function (company) {
+                    return company.name;
+                  })
+                  .join(" / ")}
+              </Text>
             </View>
           </ScrollView>
         </>
@@ -210,30 +224,30 @@ const FilmDetail = ({
               source={{ uri: getImage(film.backdrop_path) }}
             />
             <View style={styles.bodyContainer}>
-                <Text style={styles.title_text}>{film.name}</Text>
-                <Text style={styles.description_text}>{film.overview}</Text>
-                <Text style={styles.default_text}>
-                  Note : {film.vote_average} / 10
-                </Text>
-                <Text style={styles.default_text}>
-                  Nombre de votes : {film.vote_count}
-                </Text>
-                <Text style={styles.default_text}>
-                  Genre(s) :{" "}
-                  {film.genres
-                    .map(function (genre) {
-                      return genre.name;
-                    })
-                    .join(" / ")}
-                </Text>
-                <Text style={styles.default_text}>
-                  Companie(s) :{" "}
-                  {film.production_companies
-                    .map(function (company) {
-                      return company.name;
-                    })
-                    .join(" / ")}
-                </Text>
+              <Text style={styles.title_text}>{film.name}</Text>
+              <Text style={styles.description_text}>{film.overview}</Text>
+              <Text style={styles.default_text}>
+                Note : {film.vote_average} / 10
+              </Text>
+              <Text style={styles.default_text}>
+                Nombre de votes : {film.vote_count}
+              </Text>
+              <Text style={styles.default_text}>
+                Genre(s) :{" "}
+                {film.genres
+                  .map(function (genre) {
+                    return genre.name;
+                  })
+                  .join(" / ")}
+              </Text>
+              <Text style={styles.default_text}>
+                Companie(s) :{" "}
+                {film.production_companies
+                  .map(function (company) {
+                    return company.name;
+                  })
+                  .join(" / ")}
+              </Text>
             </View>
           </ScrollView>
         </>
@@ -244,7 +258,7 @@ const FilmDetail = ({
   return (
     <SafeAreaView style={styles.mainContainer}>
       {/* <StatusBar translucent backgroundColor="rgba(0,0,0,0.4)" barStyle="light-content"/> */}
-      {filmsType === 'tv' ? _displayTv() : _displayMovie()}
+      {filmsType === "tv" ? _displayTv() : _displayMovie()}
       {_displayLoading()}
     </SafeAreaView>
   );
@@ -257,6 +271,7 @@ const styles = StyleSheet.create({
   },
   bodyContainer: {
     marginHorizontal: 10,
+    paddingBottom: 20
   },
   loadingContainer: {
     position: "absolute",
@@ -269,7 +284,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     flex: 1,
-    // marginBottom: 5,
+    // paddingBottom: 20,
   },
   image: {
     height: 300,
@@ -299,24 +314,6 @@ const styles = StyleSheet.create({
     marginRight: 5,
     marginTop: 5,
   },
-  favoriteContainer: {
-    marginRight: 5,
-    paddingTop: 6,
-    paddingBottom: 4,
-    paddingHorizontal: 5,
-    borderRadius: 30,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  seenContainer: {
-    marginRight: 5,
-    padding: 5,
-    borderRadius: 30,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   headerRightButton: {
     marginRight: 5,
     padding: 5,
@@ -331,6 +328,7 @@ const mapStateToProps = (state) => {
   return {
     favoritesFilm: state.toggleFavorite.favoritesFilm,
     seenFilms: state.toggleSeen.seenFilms,
+    wishListFilms: state.toggleWishList.wishListFilms,
   };
 };
 

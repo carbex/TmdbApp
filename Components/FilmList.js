@@ -21,6 +21,7 @@ const FilmList = ({
   loadMoreOnScroll = false,
   page,
   seenFilms,
+  wishListFilms,
   totalPages,
   maxPages
 }) => {
@@ -47,6 +48,11 @@ const FilmList = ({
             }
             isAlreadySeen={
               seenFilms.findIndex((film) => film.id === item.id) !== -1
+                ? true
+                : false
+            }
+            isIntoWishList={
+              wishListFilms.findIndex((film) => film.id === item.id) !== -1
                 ? true
                 : false
             }
@@ -80,6 +86,7 @@ const mapStateToProps = (state) => {
   return {
     favoritesFilm: state.toggleFavorite.favoritesFilm,
     seenFilms: state.toggleSeen.seenFilms,
+    wishListFilms: state.toggleWishList.wishListFilms
   };
 };
 export default connect(mapStateToProps, null)(FilmList);
