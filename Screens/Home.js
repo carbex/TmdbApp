@@ -7,7 +7,8 @@ import {
   ScrollView,
   ActivityIndicator,
   Animated,
-  TouchableOpacity,
+  RefreshControl,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -16,7 +17,6 @@ import {
   getUpcoming,
   getTopRated,
 } from "../API/TMDBApi";
-import HorizontalFilmList from "../Components/HorizontalFilmList";
 import FilmList from "../Components/FilmList";
 import SearchItem from "../Components/SearchItem";
 import { Ionicons } from "@expo/vector-icons";
@@ -27,7 +27,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 const SPACING = 20;
 const HEADER_MAX_HEIGHT = 120;
-const HEADER_MIN_HEIGHT = 55;
+const HEADER_MIN_HEIGHT = 56;
 
 const Home = ({ navigation }) => {
   const [searchedText, setSearchedText] = useState("");
@@ -48,6 +48,7 @@ const Home = ({ navigation }) => {
   const [isPopularLoading, setIsPopularLoading] = useState(true);
   const [isUpcomingLoading, setIsUpcomingLoading] = useState(true);
   const [isTopRatedLoading, setIsTopRatedLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
@@ -78,18 +79,20 @@ const Home = ({ navigation }) => {
     extrapolate: "clamp",
   });
 
-  const _searchFilms = () => {
-    navigation.navigate("SearchScreen", { text: searchedText });
-    setSearchedText("");
-  };
-
-  const _moreFilms = (type) => {
-    navigation.navigate("MoreScreen", { type: type });
-  };
-
-  const _searchTextInputChanged = (text) => {
-    setSearchedText(text);
-  };
+  useEffect(() => {
+    if (nowPlayingFilms.length === 0) {
+      _loadNowPlayingFilms();
+    }
+    if (popularFilms.length === 0) {
+      _loadPopularFilms();
+    }
+    if (upcomingFilms.length === 0) {
+      _loadUpcomingFilms();
+    }
+    if (topRatedFilms.length === 0) {
+      _loadTopRatedFilms();
+    }
+  }, []);
 
   const _loadNowPlayingFilms = async () => {
     setIsNowPlayingLoading(true);
@@ -99,17 +102,6 @@ const Home = ({ navigation }) => {
       setNowPlayingTotalPages(data.total_pages);
       setNowPlayingFilms([...nowPlayingFilms, ...data.results]);
       setIsNowPlayingLoading(false);
-    }
-  };
-
-  const _loadPopularFilms = async () => {
-    setIsPopularLoading(true);
-    const data = await getPopular(popularPage + 1, type);
-    if (data) {
-      setPopularPage(data.page);
-      setPopularTotalPages(data.total_pages);
-      setPopularFilms([...popularFilms, ...data.results]);
-      setIsPopularLoading(false);
     }
   };
 
@@ -124,6 +116,17 @@ const Home = ({ navigation }) => {
     }
   };
 
+  const _loadPopularFilms = async () => {
+    setIsPopularLoading(true);
+    const data = await getPopular(popularPage + 1, type);
+    if (data) {
+      setPopularPage(data.page);
+      setPopularTotalPages(data.total_pages);
+      setPopularFilms([...popularFilms, ...data.results]);
+      setIsPopularLoading(false);
+    }
+  };
+
   const _loadTopRatedFilms = async () => {
     setIsTopRatedLoading(true);
     const data = await getTopRated(topRatedPage + 1);
@@ -135,37 +138,39 @@ const Home = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
-    if (nowPlayingFilms.length === 0) {
-      _loadNowPlayingFilms();
-    }
-  }, [nowPlayingFilms]);
-
-  useEffect(() => {
-    if (popularFilms.length === 0) {
-      _loadPopularFilms();
-    }
-  }, [popularFilms, type]);
-
-  useEffect(() => {
-    if (upcomingFilms.length === 0) {
-      _loadUpcomingFilms();
-    }
-  }, [upcomingFilms]);
-
-  useEffect(() => {
-    if (topRatedFilms.length === 0) {
-      _loadTopRatedFilms();
-    }
-  }, [topRatedFilms]);
-
-  const _displayLoading = () => {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="orange" />
-      </View>
-    );
+  const _searchFilms = () => {
+    navigation.navigate("SearchScreen", { text: searchedText });
+    setSearchedText("");
   };
+
+  const _moreFilms = (type) => {
+    navigation.navigate("MoreScreen", { type });
+  };
+
+  const _searchTextInputChanged = (text) => {
+    setSearchedText(text);
+  };
+
+  const _refreshAll = async () => {
+    const promises = [
+      _loadNowPlayingFilms(),
+      _loadPopularFilms(),
+      _loadUpcomingFilms(),
+      _loadTopRatedFilms(),
+    ];
+    await Promise.all(promises);
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setNowPlayingPage(0);
+    setTopRatedPage(0);
+    setPopularPage(0);
+    setUpcomingPage(0);
+    _refreshAll().then(() => {
+      setRefreshing(false);
+    });
+  }, []);
 
   const _toggleType = () => {
     if (type === "movie") {
@@ -177,24 +182,32 @@ const Home = ({ navigation }) => {
     setPopularFilms([]);
   };
 
+  const _displayLoading = () => {
+    return (
+      <View style={styles.loadingContainer}>
+        <View style={styles.loadingIcon}>
+          <ActivityIndicator size="large" color="orange" />
+        </View>
+      </View>
+    );
+  };
+
   const ListHeader = ({ title, type }) => {
     return (
       <View style={styles.listHeader}>
         <Text style={styles.listHeaderText}>{title}</Text>
-        <TouchableOpacity
-        onPress={() => _moreFilms(type)}
-        >
+        <TouchableWithoutFeedback onPress={() => _moreFilms(type)}>
           <Ionicons
             name="arrow-forward-outline"
             size={30}
             color="black"
             style={{
-              borderRadius: 40,
+              borderRadius: 20,
               backgroundColor: "white",
               padding: 5,
             }}
           />
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
       </View>
     );
   };
@@ -204,7 +217,14 @@ const Home = ({ navigation }) => {
       <Animated.View
         style={[
           styles.headerContainer,
-          { height: headerHeight, elevation: headerElevation },
+          {
+            height: headerHeight,
+            elevation: headerElevation,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+          },
         ]}
       >
         <Animated.View
@@ -219,53 +239,70 @@ const Home = ({ navigation }) => {
         <Text style={styles.headerText}>TMDB APP</Text>
       </Animated.View>
       <ScrollView
-        scrollEventThrottle={0.1}
-        contentContainerStyle={{ paddingTop: 70, backgroundColor: 'white' }}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: 130 }}
         onScroll={_onScroll}
+        refreshControl={
+          <RefreshControl
+            tintColor="#ff0000"
+            title="Loading..."
+            titleColor="#00ff00"
+            colors={["#ff0000", "#00ff00", "#0000ff"]}
+            progressBackgroundColor="#ffffff"
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       >
         <View style={styles.listContainer}>
-          <ListHeader title="Films à l'affiche" type="nowPlaying"/>
-          <FilmList
-            horizontal={true}
-            films={[...new Set(nowPlayingFilms)]}
-            navigation={navigation}
-            loadFilms={_loadNowPlayingFilms}
-            page={nowPlayingPage}
-            totalPages={nowPlayingTotalPages}
-            maxPages={1}
-            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
-          />
-          {isNowPlayingLoading && _displayLoading()}
+          <ListHeader title="Bientôt à l'affiche" type="upcoming" />
+          <View style={styles.listBody}>
+            <FilmList
+              horizontal={true}
+              films={[...new Set(upcomingFilms)]}
+              navigation={navigation}
+              loadFilms={_loadUpcomingFilms}
+              page={upcomingPage}
+              totalPages={upcomingTotalPages}
+              maxPages={1}
+              loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
+            />
+            {isUpcomingLoading && _displayLoading()}
+          </View>
         </View>
 
         <View style={styles.listContainer}>
-          <ListHeader title="Films bientôt à l'affiche" type="upcoming" />
-          <FilmList
-            horizontal={true}
-            films={[...new Set(upcomingFilms)]}
-            navigation={navigation}
-            loadFilms={_loadUpcomingFilms}
-            page={upcomingPage}
-            totalPages={upcomingTotalPages}
-            maxPages={1}
-            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
-          />
-          {isUpcomingLoading && _displayLoading()}
+          <ListHeader title="Toujours à l'affiche" type="nowPlaying" />
+          <View style={styles.listBody}>
+            <FilmList
+              horizontal={true}
+              films={[...new Set(nowPlayingFilms)]}
+              navigation={navigation}
+              loadFilms={_loadNowPlayingFilms}
+              page={nowPlayingPage}
+              totalPages={nowPlayingTotalPages}
+              maxPages={1}
+              loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
+            />
+            {isNowPlayingLoading && _displayLoading()}
+          </View>
         </View>
 
         <View style={styles.listContainer}>
-          <ListHeader title="Films populaires" type="popular"/>
-          <FilmList
-            horizontal={true}
-            films={[...new Set(popularFilms)]}
-            navigation={navigation}
-            loadFilms={_loadPopularFilms}
-            page={popularPage}
-            totalPages={popularTotalPages}
-            maxPages={1}
-            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
-          />
-          {isPopularLoading && _displayLoading()}
+          <ListHeader title="Films les plus consultés" type="popular" />
+          <View style={styles.listBody}>
+            <FilmList
+              horizontal={true}
+              films={[...new Set(popularFilms)]}
+              navigation={navigation}
+              loadFilms={_loadPopularFilms}
+              page={popularPage}
+              totalPages={popularTotalPages}
+              maxPages={1}
+              loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
+            />
+            {isPopularLoading && _displayLoading()}
+          </View>
         </View>
 
         {/* <View style={styles.listContainer}>
@@ -297,18 +334,20 @@ const Home = ({ navigation }) => {
         </View> */}
 
         <View style={styles.listContainer}>
-          <ListHeader title="Films les mieux notés" type="topRated"/>
-          <FilmList
-            horizontal={true}
-            films={[...new Set(topRatedFilms)]}
-            navigation={navigation}
-            loadFilms={_loadTopRatedFilms}
-            page={topRatedPage}
-            totalPages={topRatedTotalPages}
-            maxPages={1}
-            loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
-          />
-          {isTopRatedLoading && _displayLoading()}
+          <ListHeader title="Films les mieux notés" type="topRated" />
+          <View style={styles.listBody}>
+            <FilmList
+              horizontal={true}
+              films={[...new Set(topRatedFilms)]}
+              navigation={navigation}
+              loadFilms={_loadTopRatedFilms}
+              page={topRatedPage}
+              totalPages={topRatedTotalPages}
+              maxPages={1}
+              loadMoreOnScroll={true} // Permet de déclencher le chargement de plus de film lors du scroll
+            />
+            {isTopRatedLoading && _displayLoading()}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -325,16 +364,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    minHeight: 160,
-  },
-  loadingContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 100,
-    bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
+    minHeight: 212,
   },
   listHeader: {
     flexDirection: "row",
@@ -342,8 +372,31 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: SPACING,
   },
+  listBody: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingContainer: {
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingIcon: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 30,
+    shadowColor: "#000",
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    elevation: 4,
+  },
   listHeaderText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     paddingRight: 10,
   },
@@ -360,6 +413,7 @@ const styles = StyleSheet.create({
     },
     // elevation: 4,
     backgroundColor: "white",
+    zIndex: 10,
   },
   searchSection: {
     marginHorizontal: SPACING,
@@ -368,7 +422,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     overflow: "hidden",
     shadowColor: "#000",
     shadowOpacity: 1,
@@ -384,7 +438,7 @@ const styles = StyleSheet.create({
   headerTextInput: {
     flex: 1,
     paddingHorizontal: SPACING / 2,
-    backgroundColor: "#fff",
+    // backgroundColor: "white",
     color: "#424242",
   },
   headerText: {

@@ -57,7 +57,7 @@ const FilmItem = ({
           style={styles.backgroundImage}
           source={{ uri: getImage(film.backdrop_path) }}
           resizeMode="cover"
-          blurRadius={10}
+          blurRadius={20}
           blurType="light"
         />
         <BlurView intensity={100} tint="light" style={styles.blurView}>

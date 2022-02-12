@@ -1,13 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Text,
   View,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from "react-native";
 import { connect } from "react-redux";
 import { getFilms } from "../API/TMDBApi";
@@ -16,8 +14,6 @@ import SearchItem from "../Components/SearchItem";
 import { Ionicons } from "@expo/vector-icons";
 
 const SPACING = 20;
-const HEADER_MAX_HEIGHT = 120;
-const HEADER_MIN_HEIGHT = 55;
 
 const Search = ({ navigation, route }) => {
   const { text } = route.params;
@@ -56,13 +52,13 @@ const Search = ({ navigation, route }) => {
   }, [films]);
 
   useEffect(() => {
-    if(text.length > 0) {
-      setSearchedText(text)
+    if (text.length > 0) {
+      setSearchedText(text);
       setPage(0);
       setTotalPages(0);
       setFilms([]);
-    } 
-  }, [text]) 
+    }
+  }, [text]);
 
   const _searchTextInputChanged = (text) => {
     setSearchedText(text);
@@ -72,22 +68,22 @@ const Search = ({ navigation, route }) => {
     if (isLoading) {
       return (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="orange" />
+          <View style={styles.loadingIcon}>
+            <ActivityIndicator size="large" color="orange" />
+          </View>
         </View>
       );
     }
   };
 
   const _goBack = () => {
-    navigation.goBack()
-  }
+    navigation.goBack();
+  };
 
   return (
     <SafeAreaView style={styles.mainContainer}>
       <View style={styles.headerContainer}>
-        <TouchableWithoutFeedback
-        onPress={_goBack}
-        >
+        <TouchableWithoutFeedback onPress={_goBack}>
           <Ionicons
             name="arrow-back-outline"
             size={30}
@@ -133,7 +129,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     paddingHorizontal: SPACING / 2,
     height: 55,
-    flexDirection: 'row',
+    flexDirection: "row",
     alignItems: "center",
     shadowColor: "#000",
     shadowOpacity: 1,
@@ -148,8 +144,7 @@ const styles = StyleSheet.create({
   searchSection: {
     flex: 1,
     padding: 4,
-    marginLeft: SPACING / 2,
-    marginVertical: SPACING / 2,
+    margin: SPACING / 2,
     borderRadius: SPACING / 2,
     flexDirection: "row",
     justifyContent: "center",
@@ -204,14 +199,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loadingContainer: {
-    // position: "absolute",
-    // left: 0,
-    // right: 0,
-    // top: 100,
-    // bottom: 0,
-    flexGrow: 1,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+  loadingIcon: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 30,
+    shadowColor: "#000",
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    elevation: 4,
   },
 });
 

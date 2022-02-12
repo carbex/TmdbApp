@@ -40,7 +40,7 @@ const FilmList = ({
         ) : (
           <FilmItem
             film={item}
-            index={index}
+            // index={index}
             isFilmFavorite={
               favoritesFilm.findIndex((film) => film.id === item.id) !== -1
                 ? true

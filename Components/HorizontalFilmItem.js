@@ -4,7 +4,7 @@ import moment from "moment";
 import { getImage } from "../API/TMDBApi";
 
 const SPACING = 20;
-const IMAGE_HEIGHT = 160;
+const IMAGE_HEIGHT = 150;
 const IMAGE_WIDTH = 100;
 
 const HorizontalFilmItem = ({ film, displayFilmDetail }) => {
@@ -33,8 +33,18 @@ export default HorizontalFilmItem;
 
 const styles = StyleSheet.create({
   itemContainer: {
-    width: IMAGE_WIDTH,
+    borderRadius: SPACING / 2,
+    overflow: 'hidden',
     marginHorizontal: SPACING / 2,
+    backgroundColor: 'white',
+    shadowColor: "#000",
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    elevation: 4,
   },
   itemImage: {
     height: IMAGE_HEIGHT,

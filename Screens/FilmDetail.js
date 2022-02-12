@@ -55,48 +55,6 @@ const FilmDetail = ({
               >
                 <Ionicons size={30} name="share-social" color="black" />
               </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback
-                style={styles.headerRightButton}
-                onPress={() => _toggle("TOGGLE_FAVORITE")}
-                onPressIn={() => setHeartIsTouched(true)}
-                onPressOut={() => setHeartIsTouched(false)}
-              >
-                {_displayImage(
-                  favoritesFilm,
-                  heartIsTouched,
-                  "heart",
-                  "orange",
-                  "black"
-                )}
-              </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback
-                style={styles.headerRightButton}
-                onPress={() => _toggle("TOGGLE_SEEN")}
-                onPressIn={() => setEyeIsTouched(true)}
-                onPressOut={() => setEyeIsTouched(false)}
-              >
-                {_displayImage(
-                  seenFilms,
-                  eyeIsTouched,
-                  "eye",
-                  "orange",
-                  "black"
-                )}
-              </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback
-                style={styles.headerRightButton}
-                onPress={() => _toggle("TOGGLE_WISHLIST")}
-                onPressIn={() => setBookmarkIsTouched(true)}
-                onPressOut={() => setBookmarkIsTouched(false)}
-              >
-                {_displayImage(
-                  wishListFilms,
-                  bookmarkIsTouched,
-                  "bookmark",
-                  "orange",
-                  "black"
-                )}
-              </TouchableWithoutFeedback>
             </View>
           );
         }
@@ -117,7 +75,9 @@ const FilmDetail = ({
     if (isLoading) {
       return (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="orange" />
+          <View style={styles.loadingIcon}>
+            <ActivityIndicator size="large" color="orange" />
+          </View>
         </View>
       );
     }
@@ -166,15 +126,67 @@ const FilmDetail = ({
     );
   };
 
+  const _displayIcons = () => {
+    return(
+      <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, right: 0}}>
+        <TouchableWithoutFeedback
+                style={styles.headerRightButton}
+                onPress={() => _toggle("TOGGLE_FAVORITE")}
+                onPressIn={() => setHeartIsTouched(true)}
+                onPressOut={() => setHeartIsTouched(false)}
+              >
+                {_displayImage(
+                  favoritesFilm,
+                  heartIsTouched,
+                  "heart",
+                  "orange",
+                  "grey"
+                )}
+              </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                style={styles.headerRightButton}
+                onPress={() => _toggle("TOGGLE_SEEN")}
+                onPressIn={() => setEyeIsTouched(true)}
+                onPressOut={() => setEyeIsTouched(false)}
+              >
+                {_displayImage(
+                  seenFilms,
+                  eyeIsTouched,
+                  "eye",
+                  "orange",
+                  "grey"
+                )}
+              </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                style={styles.headerRightButton}
+                onPress={() => _toggle("TOGGLE_WISHLIST")}
+                onPressIn={() => setBookmarkIsTouched(true)}
+                onPressOut={() => setBookmarkIsTouched(false)}
+              >
+                {_displayImage(
+                  wishListFilms,
+                  bookmarkIsTouched,
+                  "bookmark",
+                  "orange",
+                  "grey"
+                )}
+              </TouchableWithoutFeedback>
+      </View>
+    )
+  }
+
   const _displayMovie = () => {
     if (film !== undefined) {
       return (
         <>
           <ScrollView style={styles.scrollViewContainer}>
-            <Image
-              style={styles.image}
-              source={{ uri: getImage(film.backdrop_path) }}
-            />
+            <View>
+              <Image
+                style={styles.image}
+                source={{ uri: getImage(film.backdrop_path) }}
+              />
+              {_displayIcons()}
+            </View>
             <View style={styles.bodyContainer}>
               <Text style={styles.title_text}>{film.title}</Text>
               <Text style={styles.description_text}>{film.overview}</Text>
@@ -277,10 +289,23 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    top: 100,
+    top: 0,
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+  loadingIcon: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 30,
+    shadowColor: "#000",
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    elevation: 4,
   },
   scrollViewContainer: {
     flex: 1,
@@ -318,7 +343,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
     padding: 5,
     borderRadius: 30,
-    backgroundColor: "white",
+    backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
   },

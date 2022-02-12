@@ -1,17 +1,26 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { Animated } from "react-native";
 import Layout from "../Constants/Layout";
+import { useFocusEffect } from '@react-navigation/native';
 
 function FadIn({ index, children }) {
   const positionLeft = useRef(new Animated.Value(Layout.window.width)).current;
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     Animated.spring(positionLeft, {
       toValue: 0,
       useNativeDriver: false,
-      // delay: (index * 150)
+      // delay: (index * 100)
     }).start();
-  }, [index]);
+    return () => {
+      Animated.spring(positionLeft, {
+        toValue: Layout.window.width,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [index])
+  );
 
   return (
     <Animated.View style={{ left: positionLeft }}>{children}</Animated.View>

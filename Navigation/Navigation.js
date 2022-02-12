@@ -38,6 +38,16 @@ const HomeStackNavigator = () => {
         headerMode: "screen",
         headerStyle: { backgroundColor: "white" },
         headerTitleStyle: { fontWeight: "bold" },
+        headerStyle: {
+          shadowColor: "#000",
+          shadowOffset: {
+            width: 0,
+            height: 2,
+          },
+          shadowOpacity: 0.25,
+          shadowRadius: 4.84,
+          elevation: 12,
+        },
       }}
     >
       <HomeStack.Group>
@@ -57,6 +67,7 @@ const HomeStackNavigator = () => {
             headerShown: false,
             title: "Rechercher",
             headerTitleAlign: "center",
+            gestureEnabled: true,
           }}
         />
         <HomeStack.Screen
@@ -77,6 +88,8 @@ const HomeStackNavigator = () => {
             headerShown: true,
             title: "More",
             headerTitleAlign: "center",
+            gestureEnabled: true,
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           }}
         />
       </HomeStack.Group>
@@ -339,7 +352,7 @@ const MovieTabNavigator = () => {
         tabBarActiveTintColor: Colors[colorScheme].tint,
         tabBarInactiveTintColor: "black",
         // tabBarActiveBackgroundColor: 'black',
-        // tabBarInactiveBackgroundColor: 'black'
+        // tabBarInactiveBackgroundColor: 'orange'
       }}
     >
       <BottomTab.Screen

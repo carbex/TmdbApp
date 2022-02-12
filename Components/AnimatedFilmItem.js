@@ -1,14 +1,9 @@
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 import { getImage } from "../API/TMDBApi";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
+import { BlurView } from "expo-blur";
 
 const IMAGE_SIZE = 70;
 const SPACING = 20;
@@ -78,14 +73,23 @@ const AnimatedFilmItem = ({
       onPress={() => displayFilmDetail(film.id)}
       onLongPress={() => setToggleDisplay(!toggleDisplay)}
     >
-      <View style={styles.imageContainer}>
-        <Image
-          style={styles.image}
-          source={{ uri: getImage(film.poster_path) }}
-        />
-        {_displayIcons()}
-      </View>
-      <View style={styles.contentContainer}>{_displayText()}</View>
+      <Image
+        style={styles.backgroundImage}
+        source={{ uri: getImage(film.poster_path) }}
+        resizeMode="cover"
+        blurRadius={20}
+        blurType="light"
+      />
+      <BlurView intensity={100} tint="light" style={styles.blurView}>
+        <View style={styles.imageContainer}>
+          <Image
+            style={styles.image}
+            source={{ uri: getImage(film.poster_path) }}
+          />
+          {_displayIcons()}
+        </View>
+        <View style={styles.contentContainer}>{_displayText()}</View>
+      </BlurView>
     </TouchableOpacity>
   );
 };
@@ -95,8 +99,8 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    padding: SPACING,
-    marginVertical: SPACING / 2,
+    // padding: SPACING,
+    margin: SPACING / 2,
     borderRadius: SPACING,
     backgroundColor: "white",
     shadowColor: "#000",
@@ -107,6 +111,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4.84,
     elevation: 5,
+    overflow: "hidden",
   },
   imageContainer: {
     marginRight: SPACING / 2,
@@ -132,6 +137,21 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -2,
     right: -2,
+  },
+  blurView: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: SPACING,
+  },
+  backgroundImage: {
+    flex: 1,
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    right: 0,
+    backgroundColor: "lightgrey",
   },
 });
 
