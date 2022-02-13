@@ -9,6 +9,7 @@ import {
   Animated,
   RefreshControl,
   TouchableWithoutFeedback,
+  TouchableOpacity
 } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import {
@@ -72,7 +73,7 @@ const Home = ({ navigation }) => {
 
   const headerElevation = scrollY.interpolate({
     inputRange: [
-      HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT,
+      HEADER_MIN_HEIGHT,
       HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT,
     ],
     outputRange: [0, 10],
@@ -196,18 +197,13 @@ const Home = ({ navigation }) => {
     return (
       <View style={styles.listHeader}>
         <Text style={styles.listHeaderText}>{title}</Text>
-        <TouchableWithoutFeedback onPress={() => _moreFilms(type)}>
+        <TouchableOpacity onPress={() => _moreFilms(type)}>
           <Ionicons
             name="arrow-forward-outline"
             size={30}
             color="black"
-            style={{
-              borderRadius: 20,
-              backgroundColor: "white",
-              padding: 5,
-            }}
           />
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -364,7 +360,8 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    minHeight: 212,
+    minHeight: 202,
+    marginBottom: SPACING / 2
   },
   listHeader: {
     flexDirection: "row",
@@ -401,7 +398,6 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   headerContainer: {
-    height: HEADER_MAX_HEIGHT,
     justifyContent: "flex-end",
     alignItems: "center",
     shadowColor: "#000",

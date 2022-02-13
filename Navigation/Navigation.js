@@ -11,12 +11,12 @@ import Favorites from "../Screens/Favorites";
 import News from "../Screens/News";
 import Seen from "../Screens/Seen";
 import WishList from "../Screens/WishList"
-import Modal from "../Components/Modal";
 import Home from "../Screens/Home"
 import More from "../Screens/More"
+import FilmPlayer from "../Screens/FilmPlayer";
 import { Ionicons } from "@expo/vector-icons";
 import Colors from "../Constants/Colors";
-import { Text, Pressable, useColorScheme } from "react-native";
+import { useColorScheme } from "react-native";
 
 export default function Navigation({ colorScheme }) {
   return (
@@ -92,64 +92,19 @@ const HomeStackNavigator = () => {
             headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           }}
         />
-      </HomeStack.Group>
-    </HomeStack.Navigator>
-  );
-};
-
-const SearchStack = createStackNavigator();
-
-const SearchStackNavigator = () => {
-  const colorScheme = useColorScheme();
-  return (
-    <SearchStack.Navigator
-      screenOptions={{
-        headerMode: "screen",
-        headerStyle: { backgroundColor: "white" },
-        headerTitleStyle: { fontWeight: "bold" },
-      }}
-    >
-      <SearchStack.Group>
-        <SearchStack.Screen
-          name="SearchScreen"
-          component={Search}
-          options={({ navigation }) => ({
-            headerShown: false,
-            title: "Rechercher",
-            headerTitleAlign: "center",
-            headerRight: () => (
-              <Pressable
-                onPress={() => navigation.navigate("Modal")}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.5 : 1,
-                  marginRight: 15,
-                })}
-              >
-                <Text>Modal</Text>
-              </Pressable>
-            ),
-          })}
-        />
-        <SearchStack.Screen
-          name="FilmDetail"
-          component={FilmDetail}
-          options={() => ({
+        <HomeStack.Screen
+          name="FilmPlayerScreen"
+          component={FilmPlayer}
+          options={{
             headerShown: true,
-            // headerTransparent: true,
             title: "",
+            headerTitleAlign: "center",
             gestureEnabled: true,
             headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
-          })}
+          }}
         />
-      </SearchStack.Group>
-      <SearchStack.Group screenOptions={{ presentation: "modal" }}>
-        <SearchStack.Screen
-          name="Modal"
-          component={Modal}
-          options={{ headerShown: true }}
-        />
-      </SearchStack.Group>
-    </SearchStack.Navigator>
+      </HomeStack.Group>
+    </HomeStack.Navigator>
   );
 };
 
@@ -194,6 +149,17 @@ const FavoritesStackNavigator = () => {
             gestureEnabled: true,
             headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
+        />
+        <FavoritesStack.Screen
+          name="FilmPlayerScreen"
+          component={FilmPlayer}
+          options={{
+            headerShown: true,
+            title: "",
+            headerTitleAlign: "center",
+            gestureEnabled: true,
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
+          }}
         />
       </FavoritesStack.Group>
     </FavoritesStack.Navigator>
@@ -242,6 +208,17 @@ const NewsStackNavigator = () => {
             headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
         />
+        <NewsStack.Screen
+          name="FilmPlayerScreen"
+          component={FilmPlayer}
+          options={{
+            headerShown: true,
+            title: "",
+            headerTitleAlign: "center",
+            gestureEnabled: true,
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
+          }}
+        />
       </NewsStack.Group>
     </NewsStack.Navigator>
   );
@@ -288,6 +265,17 @@ const SeenStackNavigator = () => {
             gestureEnabled: true,
             headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
+        />
+        <SeenStack.Screen
+          name="FilmPlayerScreen"
+          component={FilmPlayer}
+          options={{
+            headerShown: true,
+            title: "",
+            headerTitleAlign: "center",
+            gestureEnabled: true,
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
+          }}
         />
       </SeenStack.Group>
     </SeenStack.Navigator>
@@ -336,6 +324,17 @@ const WishListStackNavigator = () => {
             headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
           })}
         />
+        <WishListStack.Screen
+          name="FilmPlayerScreen"
+          component={FilmPlayer}
+          options={{
+            headerShown: true,
+            title: "",
+            headerTitleAlign: "center",
+            gestureEnabled: true,
+            headerBackImage: () => <HeaderBackIcon color={Colors[colorScheme].text}/>,
+          }}
+        />
       </WishListStack.Group>
     </WishListStack.Navigator>
   );
@@ -366,26 +365,6 @@ const MovieTabNavigator = () => {
           ),
         }}
       />
-      {/* <BottomTab.Screen
-        name="SearchStack"
-        component={SearchStackNavigator}
-        options={{
-          headerShown: false,
-          title: "Rechercher",
-          tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
-        }}
-      /> */}
-      {/* <BottomTab.Screen
-        name="NewsStack"
-        component={NewsStackNavigator}
-        options={{
-          headerShown: false,
-          title: "Nouveautés",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="film-outline" color={color} />
-          ),
-        }}
-      /> */}
       <BottomTab.Screen
         name="FavoritesStack"
         component={FavoritesStackNavigator}

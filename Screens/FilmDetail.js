@@ -12,11 +12,13 @@ import {
 import { getMovieDetail, getTvDetail, getImage } from "../API/TMDBApi";
 import { connect } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import {
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native-gesture-handler";
 import moment from "moment";
 import numeral from "numeral";
 import Bounce from "../Animations/Bounce";
-import { Header } from "react-native/Libraries/NewAppScreen";
 
 const FilmDetail = ({
   dispatch,
@@ -127,53 +129,81 @@ const FilmDetail = ({
   };
 
   const _displayIcons = () => {
-    return(
-      <View style={{flexDirection: 'row', position: 'absolute', bottom: 0, right: 0}}>
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          position: "absolute",
+          bottom: 0,
+          right: 0,
+        }}
+      >
         <TouchableWithoutFeedback
-                style={styles.headerRightButton}
-                onPress={() => _toggle("TOGGLE_FAVORITE")}
-                onPressIn={() => setHeartIsTouched(true)}
-                onPressOut={() => setHeartIsTouched(false)}
-              >
-                {_displayImage(
-                  favoritesFilm,
-                  heartIsTouched,
-                  "heart",
-                  "orange",
-                  "grey"
-                )}
-              </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback
-                style={styles.headerRightButton}
-                onPress={() => _toggle("TOGGLE_SEEN")}
-                onPressIn={() => setEyeIsTouched(true)}
-                onPressOut={() => setEyeIsTouched(false)}
-              >
-                {_displayImage(
-                  seenFilms,
-                  eyeIsTouched,
-                  "eye",
-                  "orange",
-                  "grey"
-                )}
-              </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback
-                style={styles.headerRightButton}
-                onPress={() => _toggle("TOGGLE_WISHLIST")}
-                onPressIn={() => setBookmarkIsTouched(true)}
-                onPressOut={() => setBookmarkIsTouched(false)}
-              >
-                {_displayImage(
-                  wishListFilms,
-                  bookmarkIsTouched,
-                  "bookmark",
-                  "orange",
-                  "grey"
-                )}
-              </TouchableWithoutFeedback>
+          style={styles.headerRightButton}
+          onPress={() => _toggle("TOGGLE_FAVORITE")}
+          onPressIn={() => setHeartIsTouched(true)}
+          onPressOut={() => setHeartIsTouched(false)}
+        >
+          {_displayImage(
+            favoritesFilm,
+            heartIsTouched,
+            "heart",
+            "orange",
+            "grey"
+          )}
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          style={styles.headerRightButton}
+          onPress={() => _toggle("TOGGLE_SEEN")}
+          onPressIn={() => setEyeIsTouched(true)}
+          onPressOut={() => setEyeIsTouched(false)}
+        >
+          {_displayImage(seenFilms, eyeIsTouched, "eye", "orange", "grey")}
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          style={styles.headerRightButton}
+          onPress={() => _toggle("TOGGLE_WISHLIST")}
+          onPressIn={() => setBookmarkIsTouched(true)}
+          onPressOut={() => setBookmarkIsTouched(false)}
+        >
+          {_displayImage(
+            wishListFilms,
+            bookmarkIsTouched,
+            "bookmark",
+            "orange",
+            "grey"
+          )}
+        </TouchableWithoutFeedback>
       </View>
-    )
-  }
+    );
+  };
+
+  const _displayPlayButton = () => {
+    if (film !== undefined) {
+      if (film.videos.results.length !== 0) {
+        return (
+          <View style={styles.playButtonContainer}>
+            <TouchableOpacity
+              style={styles.playButton}
+              onPress={() => _displayFilmPlayer()}
+            >
+              <Ionicons size={30} name="play" color="white" />
+            </TouchableOpacity>
+          </View>
+        );
+      }
+    }
+  };
+
+  const _displayFilmPlayer = () => {
+    if (film !== undefined) {
+      if (film.videos.results.length !== 0) {
+        navigation.navigate("FilmPlayerScreen", {
+          key: film.videos.results[0].key,
+        });
+      }
+    }
+  };
 
   const _displayMovie = () => {
     if (film !== undefined) {
@@ -185,6 +215,18 @@ const FilmDetail = ({
                 style={styles.image}
                 source={{ uri: getImage(film.backdrop_path) }}
               />
+              <TouchableOpacity
+                style={{
+                  padding: 20,
+                  backgroundColor: "white",
+                  position: "absolute",
+                  top: 100,
+                  right: 100,
+                }}
+              >
+                <Text style={{ color: "orange", fontSize: 30 }}>Play</Text>
+              </TouchableOpacity>
+              {_displayPlayButton()}
               {_displayIcons()}
             </View>
             <View style={styles.bodyContainer}>
@@ -283,7 +325,7 @@ const styles = StyleSheet.create({
   },
   bodyContainer: {
     marginHorizontal: 10,
-    paddingBottom: 20
+    paddingBottom: 20,
   },
   loadingContainer: {
     position: "absolute",
@@ -346,6 +388,25 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     justifyContent: "center",
     alignItems: "center",
+  },
+  WebViewStyle: {
+    height: 300,
+    // margin: 20
+  },
+  playButtonContainer: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  playButton: {
+    borderRadius: 10,
+    backgroundColor: "rgba(46, 46, 46, 0.70)",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   },
 });
 

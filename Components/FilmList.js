@@ -26,7 +26,7 @@ const FilmList = ({
   maxPages
 }) => {
   const _displayFilmDetail = (idFilm) => {
-    navigation.navigate("FilmDetail", { idFilm: idFilm });
+    navigation.navigate("FilmDetail", { idFilm });
   };
 
   function _renderItem({ item, index }) {
