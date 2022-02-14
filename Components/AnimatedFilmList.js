@@ -28,7 +28,7 @@ const AnimatedFilmList = ({
     } else if (screen === "wishList") {
       setFilms(wishListFilms);
     }
-  }, [screen]);
+  }, [screen, seenFilms, favoritesFilm, wishListFilms]);
 
   const _displayFilmDetail = (idFilm) => {
     navigation.navigate("FilmDetail", { idFilm });
